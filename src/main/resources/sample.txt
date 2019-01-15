@@ -1,0 +1,25 @@
+{
+    aCharField : %c,
+    aStringField : %s @Size(max=5, min=3),
+    aIntegerField : %d @Max(100) @Min(10),
+    aArrayField : @Size(max=6) {
+        item : %s
+    },
+    anotherArrayField : @Size(max=6) {
+        mustToHave : %d @Max(100),
+        item : %d,
+    }
+    aObjectField : {
+        objIntegerField : %d
+    }
+    aDateField : @Date(yyyy-mm-dd),
+    aEmailField : @Email,
+    aHostName : @Hostname,
+    aIpAddress : @IP,
+    aUri : @URI,
+    aCustomizedField : @MyCustomizedValue
+    aFixIntegerValue : %d 15,
+    aFixBooleanValue : %b true
+    aFixStringValue : myvalue,
+    aValueFromList : %s @In(A, B, C, D)
+}
