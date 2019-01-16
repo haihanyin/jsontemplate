@@ -1,36 +1,37 @@
+%x is a value placehoder, @x is a constraint
 {
+    aValuedStringField : myValue,
+    aTypedValuedStringField : %s myValue,
+    aTypedStringField : %s,
+    aCustomizedTypeStringField : %Email,
+    aVariableStringField : %email,
+    aAnnotatedTypeStringField1 : %s @Size(max=5, min=3)
+    aAnnotatedTypeStringField2 : %s @Size(max=5)
+    aAnnotatedTypeStringField3 : %s @Size(5)
+
     aCharField : %c,
-    aSimpleStringField,
-    aStringField : %s @Size(max=5, min=3),
     aIntegerField : %d @Max(100) @Min(10),
-    aArrayFieldWithStringElements : @Array(max=6),
-    anotherArrayField : @Array(max=6) {
+    aArrayFieldWithStringElements : %a @Size(max=6),
+
+    anotherArrayField : %a @Size(max=6) {
         e : %d,
         mustToHave : %d @Max(100)
     },
     aObjectField : {
         objIntegerField : %d
     },
-    aDateField : @Date(yyyy-mm-dd),
-    aEmailField : @Email,
-    aHostName : @Hostname,
-    aIpAddress : @IP,
-    aUri : @URI,
-    aCustomizedField : @MyCustomizedValue
+    aDateField : %Date(yyyy-mm-dd),
+    aEmailField : %Email,
+    aHostName : %Hostname,
+    aIpAddress : %IP,
+    aUri : %URI,
+    aCustomizedField : %MyCustomizedValue
     aFixIntegerValue : %d 15,
     aFixBooleanValue : %b true,
-    aFixStringValue : myvalue,
-    aStringValueFromList : @In(A, B, C, D),
+    aStringValueFromList : %s @In(A, B, C, D),
     aIntegerValueFromList : %d @In(2, 4, 6, 8)
 }
 
-if elements has only string
-{
-    encryptedToken : {
-        payload,
-        method,
-        init_vector
-    }
+%a @Size(10) {
+    e: %s
 }
-if it is just an array with string elements
-@Array
