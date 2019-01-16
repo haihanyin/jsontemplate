@@ -1,5 +1,6 @@
 %x is a value placehoder, @x is a constraint
 {
+    aSimpleStringField,
     aValuedStringField : myValue,
     aTypedValuedStringField : %s myValue,
     aTypedStringField : %s,
@@ -11,15 +12,31 @@
 
     aCharField : %c,
     aIntegerField : %d @Max(100) @Min(10),
-    aArrayFieldWithStringElements : %a @Size(max=6),
-
-    anotherArrayField : %a @Size(max=6) {
-        e : %d,
+    aArrayFieldWithStringElements : %a,
+    aArrayFieldWithStringElements : %a @Size(max=6) [%s],
+    anotherArrayField : %a[%d] @Size(max=6) {
         mustToHave : %d @Max(100)
     },
     aObjectField : {
         objIntegerField : %d
     },
+    %NameValue : {
+        name,
+        value
+    },
+    aObjectField : %NameValue {
+        field1,
+        field2,
+        field3
+    },
+    aObjectField : {
+        name,
+        value
+    } {
+        field1,
+        field2,
+        field3
+    }
     aDateField : %Date(yyyy-mm-dd),
     aEmailField : %Email,
     aHostName : %Hostname,
@@ -32,6 +49,14 @@
     aIntegerValueFromList : %d @In(2, 4, 6, 8)
 }
 
-%a @Size(10) {
-    e: %s
+%a @Size(10)
+
+%a[%d @Max(10)]
+
+{
+    encryptedToken : {
+        method,
+        payload,
+        init_vector
+    }
 }

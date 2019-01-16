@@ -1,12 +1,17 @@
 grammar JsonTemplate;
 
-jsonRoot : jsonObject | jsonArray;
-jsonArray : annoSize '{' arrayElement (',' property)* '}';
-arrayElement : 'e' ':' propValue;
-jsonObject : '{' properties '}';
-properties : property (',' property)*;
-property : propName ':' propValue;
-propName : IDENTIFIER;
+root : jsonObject | jsonArray;
+jsonArray : '%a' constraints ('[' propValue ']')?;
+constraints : constraint*;
+constraint : ANNO_TAG annoParamPart?;
+
+jsonObject : propValue? '{' pairs '}';
+pairs : pair (',' pair)*;
+pair : key ':' propValue;
+key : typeDef | IDENTIFIER;
+typeDef : TYPEDEF;
+TYPEDEF : '%'IDENTIFIER;
+
 propValue : type? TEXT | type? anno* | jsonRoot;
 type : STRING_TYPE | CHAR_TYPE | INTEGER_TYPE | FLOAT_TYPE | BOOLEAN_TYPE;
 STRING_TYPE : '%s';
@@ -16,7 +21,7 @@ FLOAT_TYPE : '%f';
 BOOLEAN_TYPE : '%b';
 anno : annoSize | annoOther;
 annoSize : '@Size' '(' annoParams ')';
-annoOther : ANNO_OTHER_TAG annoParamPart?;
+
 annoParamPart : '(' annoParams ')';
 annoParams : listParam | listNamedParam;
 listParam : TEXT (',' TEXT)*;
@@ -25,6 +30,6 @@ listNamedParam : namedParam (',' namedParam)*;
 paramName : IDENTIFIER;
 
 IDENTIFIER : [a-zA-Z][a-zA-Z0-9]*;
-ANNO_OTHER_TAG : '@'IDENTIFIER;
+ANNO_TAG : '@'IDENTIFIER;
 STRING : .*?;
 WS : [ \t\n\r]+ -> skip ;
