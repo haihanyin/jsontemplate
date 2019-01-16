@@ -1,21 +1,33 @@
-%x is a value placehoder, @x is a constraint
 {
     aSimpleStringField,
     aValuedStringField : myValue,
-    aTypedValuedStringField : %s myValue,
+    aTypedValuedStringField : %s(myValue),
     aTypedStringField : %s,
     aCustomizedTypeStringField : %Email,
     aVariableStringField : %email,
-    aAnnotatedTypeStringField1 : %s @Size(max=5, min=3)
-    aAnnotatedTypeStringField2 : %s @Size(max=5)
-    aAnnotatedTypeStringField3 : %s @Size(5)
-
+    aAnnotatedTypeStringField1 : %s(max=5, min=3),
+    aAnnotatedTypeStringField2 : %s(max=5),
+    aAnnotatedTypeStringField3 : %s(size=5),
     aCharField : %c,
-    aIntegerField : %d @Max(100) @Min(10),
+    aIntegerField : %d(max=5, min=3),
     aArrayFieldWithStringElements : %a,
-    aArrayFieldWithStringElements : %a @Size(max=6) [%s],
-    anotherArrayField : %a[%d] @Size(max=6) {
-        mustToHave : %d @Max(100)
+    aArrayFieldWithStringElements : %a(size=6) %d,
+    aArrayFieldWithStringElements : %a(size=6) %d(max=5),
+    anotherArrayField : %a(max=6) {
+        %d(max=100),
+        %s(fixedvalue)
+    },
+    anotherArrayField : %a(max=6) %s {
+        %d(max=100),
+        %s(fixedvalue)
+    },
+    anotherArrayField : %a(max=6) {name, value} {
+        %d(max=100),
+        %s(fixedvalue)
+    },
+    anotherArrayField : %a(max=6) %NameValue {
+        %d(max=100),
+        %s(fixedvalue)
     },
     aObjectField : {
         objIntegerField : %d
@@ -37,16 +49,16 @@
         field2,
         field3
     }
-    aDateField : %Date(yyyy-mm-dd),
+    aDateField : %Date(format=yyyy-mm-dd),
     aEmailField : %Email,
     aHostName : %Hostname,
     aIpAddress : %IP,
     aUri : %URI,
     aCustomizedField : %MyCustomizedValue
-    aFixIntegerValue : %d 15,
-    aFixBooleanValue : %b true,
-    aStringValueFromList : %s @In(A, B, C, D),
-    aIntegerValueFromList : %d @In(2, 4, 6, 8)
+    aFixIntegerValue : %d(15),
+    aFixBooleanValue : %b(true),
+    aStringValueFromList : %s(in=[A, B, C, D]),
+    aIntegerValueFromList : %d(in=[2, 4, 6, 8])
 }
 
 %a @Size(10)
