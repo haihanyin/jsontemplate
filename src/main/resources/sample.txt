@@ -2,10 +2,10 @@
     aCharField : %c,
     aStringField : %s @Size(max=5, min=3),
     aIntegerField : %d @Max(100) @Min(10),
-    aArrayField : @Size(max=6) {
+    aArrayField : %a @Size(max=6) {
         e : %s
     },
-    anotherArrayField : @Size(max=6) {
+    anotherArrayField : %a @Size(max=6) {
         e : %d,
         mustToHave : %d @Max(100)
     }
