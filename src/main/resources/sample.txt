@@ -1,17 +1,16 @@
 {
     aCharField : %c,
+    aSimpleStringField,
     aStringField : %s @Size(max=5, min=3),
     aIntegerField : %d @Max(100) @Min(10),
-    aArrayField : %a @Size(max=6) {
-        e : %s
-    },
-    anotherArrayField : %a @Size(max=6) {
+    aArrayFieldWithStringElements : @Array(max=6),
+    anotherArrayField : @Array(max=6) {
         e : %d,
         mustToHave : %d @Max(100)
-    }
+    },
     aObjectField : {
         objIntegerField : %d
-    }
+    },
     aDateField : @Date(yyyy-mm-dd),
     aEmailField : @Email,
     aHostName : @Hostname,
@@ -21,5 +20,17 @@
     aFixIntegerValue : %d 15,
     aFixBooleanValue : %b true,
     aFixStringValue : myvalue,
-    aValueFromList : %s @In(A, B, C, D)
+    aStringValueFromList : @In(A, B, C, D),
+    aIntegerValueFromList : %d @In(2, 4, 6, 8)
 }
+
+if elements has only string
+{
+    encryptedToken : {
+        payload,
+        method,
+        init_vector
+    }
+}
+if it is just an array with string elements
+@Array
