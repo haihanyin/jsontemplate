@@ -1,0 +1,36 @@
+{
+    aTypedValuedStringField : %s(myValue),
+    aTypedStringField : %s,
+    aCustomizedTypeStringField : %Email,
+    aVariableStringField : %email,
+    aAnnotatedTypeStringField1 : %s(max=5, min=3),
+    aAnnotatedTypeStringField2 : %s(max=5),
+    aAnnotatedTypeStringField3 : %s(size=5),
+    aCharField : %c,
+    aIntegerField : %d(max=5, min=3),
+    aArrayFieldWithStringElements : %a %s,
+    aArrayFieldWithStringElements : %a(size=6) %d,
+    aObjectField : {
+        objIntegerField : %d
+    },
+    %NameValue : {
+        name : %s,
+        value : %s
+    },
+    aObjectField : {
+        field1 : %NameValue,
+        field2 : %NameValue,
+        field3 : %NameValue
+    },
+    aDateField : %Date(format=yyyy-mm-dd),
+    aEmailField : %Email,
+    aHostName : %Hostname,
+    aIpAddress : %IP,
+    aUri : %URI,
+    aCustomizedField : %MyCustomizedValue,
+    aFixIntegerValue : %d(15),
+    aFixBooleanValue : %b(true),
+    aArray : %a(1, 2, 3, 4) %s,
+    aStringValueFromList : %s(A, B, C, D),
+    aIntegerValueFromList : %d(2, 4, 6, 8)
+}

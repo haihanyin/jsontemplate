@@ -10,7 +10,7 @@
     aAnnotatedTypeStringField3 : %s(size=5),
     aCharField : %c,
     aIntegerField : %d(max=5, min=3),
-    aArrayFieldWithStringElements : %a,
+    aArrayFieldWithStringElements : %a %s,
     aArrayFieldWithStringElements : %a(size=6) %d,
     aArrayFieldWithStringElements : %a(size=6) %d(max=5),
     anotherArrayField : %a(max=6) {
