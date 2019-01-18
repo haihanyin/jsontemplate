@@ -4,23 +4,33 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import p.hh.jsontemplate.parser.JsonTemplateLexer;
-import p.hh.jsontemplate.parser.JsonTemplateParser;
+
+import p.hh.jsontemplate.valueproducer.StringValueProducer;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) {
-        String example = "{\n" +
-                "    aCharField : %c,\n" +
-                "    aStringField : %s @Size(max=5, min=3),\n" +
-                "    aIntegerField : %d @Max(100) @Min(10),\n" +
-                "    aArrayField : @Size(max=6) {\n" +
-                "        item : %s\n" +
-                "    }\n" +
-                "}\n";
-        CodePointCharStream codePointCharStream = CharStreams.fromString(example);
-        JsonTemplateLexer jsonTemplateLexer = new JsonTemplateLexer(codePointCharStream);
-        CommonTokenStream commonTokenStream = new CommonTokenStream(jsonTemplateLexer);
-        JsonTemplateParser parser = new JsonTemplateParser(commonTokenStream);
-        System.out.println("done");
+        System.out.println("-----");
+        StringValueProducer svProducer1 = new StringValueProducer("helloworld");
+        IntStream.range(0, 10).forEach(i -> { System.out.println(svProducer1.produce()); });
+
+        System.out.println("-----");
+        StringValueProducer svProducer2 = new StringValueProducer(Arrays.asList("A1", "B1", "C1"));
+        IntStream.range(0, 10).forEach(i -> { System.out.println(svProducer2.produce());});
+
+        System.out.println("-----");
+        Map<String, String> map = new HashMap<>();
+        StringValueProducer svProducer3 = new StringValueProducer(map);
+        IntStream.range(0, 10).forEach(i -> { System.out.println(svProducer3.produce());});
+
+        System.out.println("-----");
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("length", "10");
+        StringValueProducer svProducer4 = new StringValueProducer(map2);
+        IntStream.range(0, 10).forEach(i -> { System.out.println(svProducer4.produce());});
     }
 }

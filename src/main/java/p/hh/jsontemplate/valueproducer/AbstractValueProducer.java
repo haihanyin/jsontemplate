@@ -1,33 +1,64 @@
 package p.hh.jsontemplate.valueproducer;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.reflect.TypeUtils;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
 
     protected T fixedValue;
-    protected List<T> valueChoiceList;
-    protected Map<String, String> parameterMap;
+    protected List valueChoiceList;
 
     AbstractValueProducer(String value) {
-        this.fixedValue = parseValue();
+        try {
+            Field field = this.getClass().getSuperclass().getDeclaredField("fixedValue");
+            Type fieldType = getTypeArgument();
+            if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
+                field.setInt(this, Integer.parseInt(value));
+            } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
+                field.setFloat(this, Float.parseFloat(value));
+            } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
+                field.setBoolean(this, Boolean.parseBoolean(value));
+            } else if (String.class.equals(fieldType)) {
+                field.set(this, value);
+            } else {
+                throw new UnsupportedOperationException("Param value " + value + " cannot be parsed to type " + fieldType);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     AbstractValueProducer(List<String> valueChoices) {
-        this.valueChoiceList = valueChoices.stream().map(this::parseValue).collect(Collectors.toList());
+        try {
+            Type fieldType = getTypeArgument();
+            if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
+                this.valueChoiceList = valueChoices.stream().map(Integer::parseInt).collect(Collectors.toList());
+            } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
+                this.valueChoiceList = valueChoices.stream().map(Float::parseFloat).collect(Collectors.toList());
+            } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
+                this.valueChoiceList = valueChoices.stream().map(Boolean::parseBoolean).collect(Collectors.toList());
+            } else if (String.class.equals(fieldType)) {
+                this.valueChoiceList = valueChoices;
+            } else {
+                throw new UnsupportedOperationException("Unsupported type " + fieldType.getTypeName());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     AbstractValueProducer(Map<String, String> parameterMap) {
-        this.parameterMap = parameterMap;
-        mapToFields();
+
     }
 
     @Override
@@ -35,40 +66,44 @@ public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
         if (this.fixedValue != null) {
             return fixedValue;
         } else if (this.valueChoiceList != null) {
-            int i = RandomUtils.nextInt(0, this.valueChoiceList.size());
-            return this.valueChoiceList.get(i);
+            Random random = new Random();
+            int index = random.nextInt(this.valueChoiceList.size());
+            return (T) this.valueChoiceList.get(index);
         } else {
-            produceWithParameters();
+            return produceWithParameters();
         }
     }
 
-    abstract T parseValue(String value);
-    abstract void mapToFields();
-    abstract T produceWithParameters();
+    protected abstract T produceWithParameters();
 
-    protected Integer getInteger(String fieldName, Integer defaultValue) {
-        String paramValue = this.parameterMap.get(fieldName);
-        return paramValue != null ? Integer.parseInt(paramValue) : defaultValue;
+    protected void mapToFields(Map<String, String> parameterMap) {
+        List<Field> fields = Arrays.stream(this.getClass().getDeclaredFields())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                .collect(Collectors.toList());
+        for(Field field : fields) {
+            field.setAccessible(true);
+            String paramValue = parameterMap.get(field.getName());
+            if (paramValue != null) {
+                Class fieldType = field.getType();
+                try {
+                    if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
+                        field.setInt(this, Integer.parseInt(paramValue));
+                    } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
+                        field.setFloat(this, Float.parseFloat(paramValue));
+                    } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
+                        field.setBoolean(this, Boolean.parseBoolean(paramValue));
+                    } else if (String.class.equals(fieldType)) {
+                        field.set(this, paramValue);
+                    } else {
+                        throw new UnsupportedOperationException("Param value " + paramValue + " cannot be parsed to type " + fieldType);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
-
-    protected Float getFloat(String fieldName, Float defaultValue) {
-        String paramValue = this.parameterMap.get(fieldName);
-        return paramValue != null ? Float.parseFloat(paramValue) : defaultValue;
+    private Type getTypeArgument() {
+        return ((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
-
-    protected Boolean getBoolean(String fieldName, Boolean defaultValue) {
-        String paramValue = this.parameterMap.get(fieldName);
-        return paramValue != null ? Boolean.parseBoolean(paramValue) : defaultValue;
-    }
-
-    protected Character getCharacter(String fieldName, Character defaultValue) {
-        String paramValue = this.parameterMap.get(fieldName);
-        return paramValue != null ? paramValue.charAt(0) : defaultValue;
-    }
-
-    protected String getString(String fieldName, String defaultValue) {
-        String paramValue = this.parameterMap.get(fieldName);
-        return paramValue != null ? paramValue : defaultValue;
-    }
-
 }
