@@ -1,4 +1,12 @@
 package p.hh.jsontemplate.valueproducer;
 
-public class BooleanValueProducer {
+import java.util.Map;
+
+public class BooleanValueProducer extends AbstractValueProducer<Boolean> {
+
+    @Override
+    public Boolean produce(String value) {
+        return Boolean.parseBoolean(value);
+    }
+
 }

@@ -30,7 +30,7 @@
     aCustomizedField : %MyCustomizedValue,
     aFixIntegerValue : %d(15),
     aFixBooleanValue : %b(true),
-    aArray : %a(1, 2, 3, 4) %s,
+    aArray : %a %s [1,2,3,4],
     aStringValueFromList : %s(A, B, C, D),
     aIntegerValueFromList : %d(2, 4, 6, 8)
 }
