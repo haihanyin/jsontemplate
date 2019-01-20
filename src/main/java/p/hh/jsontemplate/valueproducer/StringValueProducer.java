@@ -9,24 +9,17 @@ import java.util.stream.Collectors;
 public class StringValueProducer extends AbstractValueProducer<String> {
 
     private final static String ALPHABETIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private int length = 5;
+    private final static int DEFAULT_LENGTH = 5;
 
-    public StringValueProducer(String value) {
-        super(value);
-    }
-
-    public StringValueProducer(List<String> valueChoices) {
-        super(valueChoices);
-    }
-
-    public StringValueProducer(Map<String, String> parameterMap) {
-        super(parameterMap);
-        mapToFields(parameterMap);
+    @Override
+    public String produce(String value) {
+        return value;
     }
 
     @Override
-    protected String produceWithParameters() {
-        char[] chars = new char[this.length];
+    public String produce(Map<String, String> paramMap) {
+        Integer length = getIntegerParam(paramMap, "length", DEFAULT_LENGTH);
+        char[] chars = new char[length];
         Random random = new Random();
         for (int i=0; i<length; i++) {
             int index = random.nextInt(ALPHABETIC.length());
@@ -34,4 +27,5 @@ public class StringValueProducer extends AbstractValueProducer<String> {
         }
         return new String(chars);
     }
+
 }

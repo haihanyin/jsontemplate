@@ -10,100 +10,78 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
 
-    protected T fixedValue;
-    protected List valueChoiceList;
-
-    AbstractValueProducer(String value) {
-        try {
-            Field field = this.getClass().getSuperclass().getDeclaredField("fixedValue");
-            Type fieldType = getTypeArgument();
-            if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
-                field.setInt(this, Integer.parseInt(value));
-            } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
-                field.setFloat(this, Float.parseFloat(value));
-            } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
-                field.setBoolean(this, Boolean.parseBoolean(value));
-            } else if (String.class.equals(fieldType)) {
-                field.set(this, value);
-            } else {
-                throw new UnsupportedOperationException("Param value " + value + " cannot be parsed to type " + fieldType);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    AbstractValueProducer(List<String> valueChoices) {
-        try {
-            Type fieldType = getTypeArgument();
-            if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
-                this.valueChoiceList = valueChoices.stream().map(Integer::parseInt).collect(Collectors.toList());
-            } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
-                this.valueChoiceList = valueChoices.stream().map(Float::parseFloat).collect(Collectors.toList());
-            } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
-                this.valueChoiceList = valueChoices.stream().map(Boolean::parseBoolean).collect(Collectors.toList());
-            } else if (String.class.equals(fieldType)) {
-                this.valueChoiceList = valueChoices;
-            } else {
-                throw new UnsupportedOperationException("Unsupported type " + fieldType.getTypeName());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    AbstractValueProducer(Map<String, String> parameterMap) {
-
+    @Override
+    public T produce(String value) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public T produce() {
-        if (this.fixedValue != null) {
-            return fixedValue;
-        } else if (this.valueChoiceList != null) {
-            Random random = new Random();
-            int index = random.nextInt(this.valueChoiceList.size());
-            return (T) this.valueChoiceList.get(index);
-        } else {
-            return produceWithParameters();
-        }
+    public T produce(List<String> valueList) {
+        int index = new Random().nextInt(valueList.size());
+        return this.produce(valueList.get(index));
     }
 
-    protected abstract T produceWithParameters();
-
-    protected void mapToFields(Map<String, String> parameterMap) {
-        List<Field> fields = Arrays.stream(this.getClass().getDeclaredFields())
-                .filter(field -> !Modifier.isStatic(field.getModifiers()))
-                .collect(Collectors.toList());
-        for(Field field : fields) {
-            field.setAccessible(true);
-            String paramValue = parameterMap.get(field.getName());
-            if (paramValue != null) {
-                Class fieldType = field.getType();
-                try {
-                    if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
-                        field.setInt(this, Integer.parseInt(paramValue));
-                    } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
-                        field.setFloat(this, Float.parseFloat(paramValue));
-                    } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
-                        field.setBoolean(this, Boolean.parseBoolean(paramValue));
-                    } else if (String.class.equals(fieldType)) {
-                        field.set(this, paramValue);
-                    } else {
-                        throw new UnsupportedOperationException("Param value " + paramValue + " cannot be parsed to type " + fieldType);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    @Override
+    public T produce(Map<String, String> paramMap) {
+        throw new UnsupportedOperationException();
     }
-    private Type getTypeArgument() {
+
+    protected Integer getIntegerParam(Map<String, String> paramMap, String paramName) {
+        return parseParamValue(paramMap, paramName, Integer::parseInt);
+    }
+
+    protected Integer getIntegerParam(Map<String, String> paramMap, String paramName, int defaultValue) {
+        return defaultIfNull(getIntegerParam(paramMap, paramName), defaultValue);
+    }
+
+    protected Float getFloatParam(Map<String, String> paramMap, String paramName) {
+        return parseParamValue(paramMap, paramName, Float::parseFloat);
+    }
+
+    protected Float getFloatParam(Map<String, String> paramMap, String paramName, float defaultValue) {
+        return defaultIfNull(getFloatParam(paramMap, paramName), defaultValue);
+    }
+
+    protected Boolean getBooleanParam(Map<String, String> paramMap, String paramName) {
+        return parseParamValue(paramMap, paramName, Boolean::parseBoolean);
+    }
+
+    protected Boolean getBooleanParam(Map<String, String> paramMap, String paramName, boolean defaultValue) {
+        return defaultIfNull(getBooleanParam(paramMap, paramName), defaultValue);
+    }
+
+    protected String getStringParam(Map<String, String> paramMap, String paramName) {
+        return paramMap.get(paramName);
+    }
+
+    protected String getStringParam(Map<String, String> paramMap, String paramName, String defaultValue) {
+        return defaultIfNull(getStringParam(paramMap, paramName), defaultValue);
+    }
+
+    protected Type getTypeArgument() {
         return ((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    protected  <R> R parseParamValue(Map<String, String> paramMap, String paramName, Function<String, R> parser) {
+        String paramValue = paramMap.get(paramName);
+        if (paramValue != null) {
+            try {
+                return parser.apply(paramValue);
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    protected  <R> R defaultIfNull(R object, R defaultValue) {
+        return object != null ? object : defaultValue;
     }
 }
