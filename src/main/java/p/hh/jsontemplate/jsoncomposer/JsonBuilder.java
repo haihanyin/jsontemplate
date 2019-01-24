@@ -100,6 +100,14 @@ public class JsonBuilder {
         return this;
     }
 
+    public boolean inObject() {
+        return nodeStack.peek() instanceof JsonObjectNode;
+    }
+
+    public boolean inArray() {
+        return nodeStack.peek() instanceof JsonArrayNode;
+    }
+
     public JsonNode build() {
         if (!nodeStack.empty()) {
             throw new IllegalStateException("Json is not build on root node");

@@ -6,6 +6,11 @@ import java.util.Random;
 public class IntegerValueProducer extends AbstractValueProducer<Integer> {
 
     @Override
+    public Class<Integer> getValueType() {
+        return Integer.class;
+    }
+
+    @Override
     public Integer produce(String value) {
         return Integer.parseInt(value);
     }
