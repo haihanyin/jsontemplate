@@ -1,42 +1,22 @@
 package p.hh.jsontemplate;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CodePointCharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 
-import org.apache.commons.lang3.ObjectUtils;
-import p.hh.jsontemplate.valueproducer.StringValueProducer;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.IntStream;
+import p.hh.jsontemplate.parser.JsonTemplateLexer;
+import p.hh.jsontemplate.parser.JsonTemplateParser;
+import p.hh.jsontemplate.parserimpl.JsonTemplateTreeListener;
 
 public class Main {
     public static void main(String[] args) {
-        StringValueProducer stringValueProducer = new StringValueProducer();
-        System.out.println("-----");
-        IntStream.range(0, 10).forEach(i -> {
-            System.out.println(stringValueProducer.produce("helloworld"));
-        });
+        String jsonTemplate = "{myfield: %s}";
 
-        System.out.println("-----");
-        IntStream.range(0, 10).forEach(i -> {
-            System.out.println(stringValueProducer.produce(Arrays.asList("A1", "B1", "C1")));
-        });
+        JsonTemplateLexer jsonTemplateLexer = new JsonTemplateLexer(new ANTLRInputStream(jsonTemplate));
+        CommonTokenStream commonTokenStream = new CommonTokenStream(jsonTemplateLexer);
+        JsonTemplateParser parser = new JsonTemplateParser(commonTokenStream);
 
-        System.out.println("-----");
-        Map<String, String> map = new HashMap<>();
-        IntStream.range(0, 10).forEach(i -> {
-            System.out.println(stringValueProducer.produce(map));
-        });
+        JsonTemplateTreeListener jsonTemplateTreeVisitor = new JsonTemplateTreeListener();
+//        jsonTemplateTreeVisitor.visit(parser.root());
 
-        System.out.println("-----");
-        Map<String, String> map2 = new HashMap<>();
-        map2.put("length", "10");
-        IntStream.range(0, 10).forEach(i -> {
-            System.out.println(stringValueProducer.produce(map2));
-        });
+
     }
 }
