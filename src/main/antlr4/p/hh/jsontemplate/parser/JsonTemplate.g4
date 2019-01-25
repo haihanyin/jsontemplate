@@ -5,28 +5,28 @@ jsonObject : '{' properties '}';
 properties : property (',' property)*;
 property : pairProperty;
 pairProperty : propertyNameSpec ':' propertyValueSpec;
-propertyNameSpec : propertyName | CUSTOM_TYPE_NAME ;
+propertyNameSpec : propertyName | typeInfo ;
 propertyName : IDENTIFIER;
-propertyValueSpec : type typeParamSpec? | jsonArray | jsonObject;
-type : stringType | charType | integerType | floatType | booleanType | customType | variableName;
-stringType : '%s';
-charType : '%c';
-integerType : '%d';
-floatType : '%f';
-booleanType : '%b';
-customType : CUSTOM_TYPE_NAME;
-variableName : VARIABLE_NAME;
-typeParamSpec : '(' typeParams ')';
-typeParams : typeParam (',' typeParam)*;
-typeParam : defaultTypeValue | typeParamName '=' typeParamValue;
-defaultTypeValue : IDENTIFIER;
-typeParamName : IDENTIFIER;
-typeParamValue : IDENTIFIER;
+typeInfo : '%'typeName;
+typeName : IDENTIFIER;
 
-jsonArray : '%a' typeParamSpec? propertyValueSpec;
+propertyValueSpec : jsonValue | jsonArray | jsonObject | variable;
+jsonValue : typeInfo typeParamSpec?;
 
+typeParamSpec : '(' singleParam ')' | '(' listParams ')' | '(' mapParams ')';
+singleParam : IDENTIFIER;
+listParams : IDENTIFIER (',' IDENTIFIER)+;
+mapParams : mapParam (',' mapParam)*;
+mapParam : IDENTIFIER '=' IDENTIFIER;
+
+jsonArray : itemsArray | genericArray;
+itemsArray : '[' items ']' jsonValue?;
+items : item (',' item)*;
+item : jsonValue | variable | value;
+value : IDENTIFIER;
+genericArray : '[]' typeParamSpec? propertyValueSpec;
+
+variable : '$'variableName;
+variableName : IDENTIFIER;
 IDENTIFIER : [a-zA-Z0-9-]+;
-
-CUSTOM_TYPE_NAME : '%'[A-Z]IDENTIFIER;
-VARIABLE_NAME : '%'[a-z]IDENTIFIER;
 WS : [ \t\n\r]+ -> skip ;
