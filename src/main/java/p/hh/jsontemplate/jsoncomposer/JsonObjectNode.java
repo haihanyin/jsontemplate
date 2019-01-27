@@ -2,33 +2,34 @@ package p.hh.jsontemplate.jsoncomposer;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class JsonObjectNode implements JsonNode {
 
     private Map<String, JsonNode> children = new LinkedHashMap<>();
 
-    public void put(String key, int value) {
-        children.put(key, new JsonIntegerNode(value));
+    public void putInteger(String key, Supplier<Integer> supplier) {
+        children.put(key, new JsonIntegerNode(supplier));
     }
 
-    public void put(String key, float value) {
-        children.put(key, new JsonFloatNode(value));
+    public void putFloat(String key, Supplier<Float> supplier) {
+        children.put(key, new JsonFloatNode(supplier));
     }
 
-    public void put(String key, boolean value) {
-        children.put(key, new JsonBooleanNode(value));
+    public void putBoolean(String key, Supplier<Boolean> supplier) {
+        children.put(key, new JsonBooleanNode(supplier));
     }
 
-    public void put(String key, String value) {
-        children.put(key, new JsonStringNode(value));
+    public void putString(String key, Supplier<String> supplier) {
+        children.put(key, new JsonStringNode(supplier));
     }
 
-    public void put(String key, JsonObjectNode value) {
+    public void putObject(String key, JsonObjectNode value) {
         children.put(key, value);
     }
 
-    public void put(String key, JsonArrayNode value) {
+    public void putArray(String key, JsonArrayNode value) {
         children.put(key, value);
     }
 

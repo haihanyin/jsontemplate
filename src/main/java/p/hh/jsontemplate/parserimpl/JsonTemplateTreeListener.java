@@ -13,6 +13,7 @@ import p.hh.jsontemplate.valueproducer.StringValueProducer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
@@ -65,33 +66,34 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     @Override
-    public void exitType(JsonTemplateParser.TypeContext ctx) {
-        String typeName = ctx.getText().substring(1);
+    public void exitTypeName(JsonTemplateParser.TypeNameContext ctx) {
+        String typeName = ctx.getText();
         currentValueProducer = valueProducerMap.get(typeName);
         Class valueType = currentValueProducer.getValueType();
         if (valueType.equals(Integer.class)) {
-            Integer value = (Integer) currentValueProducer.produce(Collections.emptyMap());
+            Supplier<Integer> supplier = () -> (Integer) currentValueProducer.produce(Collections.emptyMap());
             if (jsonBuilder.inObject()) {
-                jsonBuilder.putInteger(currentPropertyName, value);
+                jsonBuilder.putInteger(currentPropertyName, supplier);
             } else {
-                jsonBuilder.addInteger(value);
+                jsonBuilder.addInteger(supplier);
             }
         } else if (valueType.equals(Boolean.class)) {
-            Boolean value = (Boolean) currentValueProducer.produce(Collections.emptyMap());
+            Supplier<Boolean> supplier = () -> {
+                return (Boolean) currentValueProducer.produce(Collections.emptyMap());
+            };
             if (jsonBuilder.inObject()) {
-                jsonBuilder.putBoolean(currentPropertyName, value);
+                jsonBuilder.putBoolean(currentPropertyName, supplier);
             } else {
-                jsonBuilder.addBoolean(value);
+                jsonBuilder.addBoolean(supplier);
             }
         } else if (valueType.equals(String.class)) {
-            String value = (String) currentValueProducer.produce(Collections.emptyMap());
+            Supplier<String> supplier = () -> (String) currentValueProducer.produce(Collections.emptyMap());
             if (jsonBuilder.inObject()) {
-                jsonBuilder.putString(currentPropertyName, value);
+                jsonBuilder.putString(currentPropertyName, supplier);
             } else {
-                jsonBuilder.addString(value);
+                jsonBuilder.addString(supplier);
             }
         }
     }
-
 
 }

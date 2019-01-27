@@ -3,33 +3,34 @@ package p.hh.jsontemplate.jsoncomposer;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class JsonArrayNode implements JsonNode {
 
     private List<JsonNode> children = new LinkedList<>();
 
-    public void add(int value) {
-        children.add(new JsonIntegerNode(value));
+    public void addInteger(Supplier<Integer> supplier) {
+        children.add(new JsonIntegerNode(supplier));
     }
 
-    public void add(float value) {
-        children.add(new JsonFloatNode(value));
+    public void addFloat(Supplier<Float> supplier) {
+        children.add(new JsonFloatNode(supplier));
     }
 
-    public void add(boolean value) {
-        children.add(new JsonBooleanNode(value));
+    public void addBoolean(Supplier<Boolean> supplier) {
+        children.add(new JsonBooleanNode(supplier));
     }
 
-    public void add(String value) {
-        children.add(new JsonStringNode(value));
+    public void addString(Supplier<String> supplier) {
+        children.add(new JsonStringNode(supplier));
     }
 
-    public void add(JsonObjectNode value) {
+    public void addObject(JsonObjectNode value) {
         children.add(value);
     }
 
-    public void add(JsonArrayNode value) {
+    public void addArray(JsonArrayNode value) {
         children.add(value);
     }
 

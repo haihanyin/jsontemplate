@@ -1,14 +1,16 @@
 package p.hh.jsontemplate.jsoncomposer;
 
+import java.util.function.Supplier;
+
 public class JsonBooleanNode extends AbstractJsonValueNode<Boolean> {
 
-    public JsonBooleanNode(Boolean value) {
-        super(value);
+    public JsonBooleanNode(Supplier<Boolean> supplier) {
+        super(supplier);
     }
 
     @Override
     public String print() {
-        return Boolean.toString(value);
+        return Boolean.toString(supplier.get());
     }
 
 }

@@ -1,11 +1,13 @@
 package p.hh.jsontemplate.jsoncomposer;
 
+import java.util.function.Supplier;
+
 public abstract class AbstractJsonValueNode<T> implements JsonValueNode {
 
-    protected T value;
+    protected Supplier<T> supplier;
 
-    public AbstractJsonValueNode(T value) {
-        this.value = value;
+    public AbstractJsonValueNode(Supplier<T> supplier) {
+        this.supplier = supplier;
     }
 
     @Override

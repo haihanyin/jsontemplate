@@ -1,6 +1,7 @@
 package p.hh.jsontemplate.jsoncomposer;
 
 import java.util.Stack;
+import java.util.function.Supplier;
 
 public class JsonBuilder {
 
@@ -24,35 +25,35 @@ public class JsonBuilder {
 
     public JsonBuilder putArray(String key) {
         JsonArrayNode jsonArrayNode = new JsonArrayNode();
-        ((JsonObjectNode) nodeStack.peek()).put(key, jsonArrayNode);
+        ((JsonObjectNode) nodeStack.peek()).putArray(key, jsonArrayNode);
         nodeStack.push(jsonArrayNode);
         return this;
     }
 
     public JsonBuilder putObject(String key) {
         JsonObjectNode jsonObjectNode = new JsonObjectNode();
-        ((JsonObjectNode) nodeStack.peek()).put(key, jsonObjectNode);
+        ((JsonObjectNode) nodeStack.peek()).putObject(key, jsonObjectNode);
         nodeStack.push(jsonObjectNode);
         return this;
     }
 
-    public JsonBuilder putInteger(String key, int value) {
-        ((JsonObjectNode) nodeStack.peek()).put(key, value);
+    public JsonBuilder putInteger(String key, Supplier<Integer> supplier) {
+        ((JsonObjectNode) nodeStack.peek()).putInteger(key, supplier);
         return this;
     }
 
-    public JsonBuilder putFloat(String key, float value) {
-        ((JsonObjectNode) nodeStack.peek()).put(key, value);
+    public JsonBuilder putFloat(String key, Supplier<Float> supplier) {
+        ((JsonObjectNode) nodeStack.peek()).putFloat(key, supplier);
         return this;
     }
 
-    public JsonBuilder putBoolean(String key, boolean value) {
-        ((JsonObjectNode) nodeStack.peek()).put(key, value);
+    public JsonBuilder putBoolean(String key, Supplier<Boolean> supplier) {
+        ((JsonObjectNode) nodeStack.peek()).putBoolean(key, supplier);
         return this;
     }
 
-    public JsonBuilder putString(String key, String value) {
-        ((JsonObjectNode) nodeStack.peek()).put(key, value);
+    public JsonBuilder putString(String key, Supplier<String> supplier) {
+        ((JsonObjectNode) nodeStack.peek()).putString(key, supplier);
         return this;
     }
 
@@ -63,35 +64,35 @@ public class JsonBuilder {
 
     public JsonBuilder addArray() {
         JsonArrayNode jsonArrayNode = new JsonArrayNode();
-        ((JsonArrayNode) nodeStack.peek()).add(jsonArrayNode);
+        ((JsonArrayNode) nodeStack.peek()).addArray(jsonArrayNode);
         nodeStack.push(jsonArrayNode);
         return this;
     }
 
     public JsonBuilder addObject() {
         JsonObjectNode jsonObjectNode = new JsonObjectNode();
-        ((JsonArrayNode) nodeStack.peek()).add(jsonObjectNode);
+        ((JsonArrayNode) nodeStack.peek()).addObject(jsonObjectNode);
         nodeStack.push(jsonObjectNode);
         return this;
     }
 
-    public JsonBuilder addInteger(int value) {
-        ((JsonArrayNode) nodeStack.peek()).add(value);
+    public JsonBuilder addInteger(Supplier<Integer> supplier) {
+        ((JsonArrayNode) nodeStack.peek()).addInteger(supplier);
         return this;
     }
 
-    public JsonBuilder addFloat(float value) {
-        ((JsonArrayNode) nodeStack.peek()).add(value);
+    public JsonBuilder addFloat(Supplier<Float> supplier) {
+        ((JsonArrayNode) nodeStack.peek()).addFloat(supplier);
         return this;
     }
 
-    public JsonBuilder addBoolean(boolean value) {
-        ((JsonArrayNode) nodeStack.peek()).add(value);
+    public JsonBuilder addBoolean(Supplier<Boolean> supplier) {
+        ((JsonArrayNode) nodeStack.peek()).addBoolean(supplier);
         return this;
     }
 
-    public JsonBuilder addString(String value) {
-        ((JsonArrayNode) nodeStack.peek()).add(value);
+    public JsonBuilder addString(Supplier<String> supplier) {
+        ((JsonArrayNode) nodeStack.peek()).addString(supplier);
         return this;
     }
 

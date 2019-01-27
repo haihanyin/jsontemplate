@@ -11,6 +11,9 @@ public class Main {
     public static void main(String[] args) {
         String jsonTemplate = "{myfield: %s}";
 
+//        String jsonTemplate = "{%address: {city: %s, street: %s, number %i}, " +
+//                "info : { name : %s, adress: %adress}}";
+
         JsonTemplateLexer jsonTemplateLexer = new JsonTemplateLexer(new ANTLRInputStream(jsonTemplate));
         CommonTokenStream commonTokenStream = new CommonTokenStream(jsonTemplateLexer);
         JsonTemplateParser parser = new JsonTemplateParser(commonTokenStream);
@@ -20,7 +23,9 @@ public class Main {
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
         parseTreeWalker.walk(listener, parser.root());
 
-        String s = listener.getJsonBuilder().build().prettyPrint(0);
-        System.out.println(s);
+        for(int i=0; i<3; i++) {
+            String s = listener.getJsonBuilder().build().prettyPrint(0);
+            System.out.println(s);
+        }
     }
 }
