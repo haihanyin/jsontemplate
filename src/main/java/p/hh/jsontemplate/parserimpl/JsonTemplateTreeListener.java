@@ -78,9 +78,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 jsonBuilder.addInteger(supplier);
             }
         } else if (valueType.equals(Boolean.class)) {
-            Supplier<Boolean> supplier = () -> {
-                return (Boolean) currentValueProducer.produce(Collections.emptyMap());
-            };
+            Supplier<Boolean> supplier = () -> (Boolean) currentValueProducer.produce(Collections.emptyMap());
             if (jsonBuilder.inObject()) {
                 jsonBuilder.putBoolean(currentPropertyName, supplier);
             } else {
