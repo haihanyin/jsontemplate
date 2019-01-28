@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class ValueDeclaration {
 
+    private String valueName;
+
     private String typeName;
     private String singleParam;
     private List<String> listParam;
@@ -50,4 +52,11 @@ public class ValueDeclaration {
         mapParam.put(key, value);
     }
 
+    public void setValueName(String valueName) {
+        this.valueName = valueName;
+    }
+
+    public String getValueName() {
+        return valueName;
+    }
 }
