@@ -27,7 +27,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     private Map<String, IValueProducer> valueProducerMap = new HashMap<>();
     private JsonBuilder jsonBuilder;
     private String currentPropertyName;
-    private IValueProducer currentValueProducer;
+    private ValueDeclaration curValueDecl;
 
     @Override
     public void enterPropertyNameSpec(JsonTemplateParser.PropertyNameSpecContext ctx) {
@@ -107,9 +107,9 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void exitTypeName(JsonTemplateParser.TypeNameContext ctx) {
-        String typeName = ctx.getText();
-        currentValueProducer = valueProducerMap.get(typeName);
-        if (currentValueProducer == null) {
+        String typeName = curValueDecl.getTypeName();
+        IValueProducer valueProducer = valueProducerMap.get(typeName);
+        if (valueProducer == null) {
             JsonWrapperNode jsonWrapperNode = new JsonWrapperNode();
             if (jsonBuilder.inObject()) {
                 jsonBuilder.putWrapper(currentPropertyName, jsonWrapperNode);
@@ -123,20 +123,29 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 typeMissNodes.add(jsonWrapperNode);
             }
         } else {
-            Class valueType = currentValueProducer.getValueType();
+            Class valueType = valueProducer.getValueType();
             if (valueType.equals(Integer.class)) {
-                Supplier<Integer> supplier = () -> (Integer) currentValueProducer.produce(Collections.emptyMap());
-                buildJsonValue(supplier, jsonBuilder::putInteger, jsonBuilder::addInteger);
+                buildJsonValue(createSupplier(valueProducer), jsonBuilder::putInteger, jsonBuilder::addInteger);
 
             } else if (valueType.equals(Boolean.class)) {
-                Supplier<Boolean> supplier = () -> (Boolean) currentValueProducer.produce(Collections.emptyMap());
-                buildJsonValue(supplier, jsonBuilder::putBoolean, jsonBuilder::addBoolean);
+                buildJsonValue(createSupplier(valueProducer), jsonBuilder::putBoolean, jsonBuilder::addBoolean);
 
             } else if (valueType.equals(String.class)) {
-                Supplier<String> supplier = () -> (String) currentValueProducer.produce(Collections.emptyMap());
-                buildJsonValue(supplier, jsonBuilder::putString, jsonBuilder::addString);
+                buildJsonValue(createSupplier(valueProducer), jsonBuilder::putString, jsonBuilder::addString);
             }
         }
+    }
+
+    private <T> Supplier<T> createSupplier(IValueProducer<T> valueProducer) {
+        Supplier<T> supplier  = () -> (T) valueProducer.produce(Collections.emptyMap());
+        if (curValueDecl.getSingleParam() != null) {
+            supplier = () -> (T) valueProducer.produce(curValueDecl.getSingleParam());
+        } else if (curValueDecl.getListParam() != null) {
+            supplier = () -> (T) valueProducer.produce(curValueDecl.getListParam());
+        } else if (curValueDecl.getMapParam() != null) {
+            supplier = () -> (T) valueProducer.produce(curValueDecl.getMapParam());
+        }
+        return supplier;
     }
 
     private <T> void buildJsonValue(Supplier<T> supplier, BiConsumer<String, Supplier<T>> putInObject, Consumer<Supplier<T>> addInArray) {
