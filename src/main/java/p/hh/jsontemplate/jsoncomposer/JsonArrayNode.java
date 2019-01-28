@@ -34,6 +34,10 @@ public class JsonArrayNode implements JsonNode {
         children.add(value);
     }
 
+    public void addWrapper(JsonWrapperNode wrapperNode) {
+        children.add(wrapperNode);
+    }
+
     public void addNull() {
         children.add(new JsonNullNode());
     }

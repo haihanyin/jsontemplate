@@ -37,6 +37,10 @@ public class JsonObjectNode implements JsonNode {
         children.put(key, new JsonNullNode());
     }
 
+    public void putWrapper(String key, JsonWrapperNode wrapperNode) {
+        children.put(key, wrapperNode);
+    }
+
     @Override
     public String print() {
         String joinedChildren = children.entrySet().stream()

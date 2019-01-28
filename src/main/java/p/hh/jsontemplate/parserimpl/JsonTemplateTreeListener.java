@@ -1,6 +1,9 @@
 package p.hh.jsontemplate.parserimpl;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import p.hh.jsontemplate.jsoncomposer.JsonBuilder;
+import p.hh.jsontemplate.jsoncomposer.JsonNode;
+import p.hh.jsontemplate.jsoncomposer.JsonWrapperNode;
 import p.hh.jsontemplate.parser.JsonTemplateBaseListener;
 import p.hh.jsontemplate.parser.JsonTemplateBaseVisitor;
 import p.hh.jsontemplate.parser.JsonTemplateParser;
@@ -10,88 +13,137 @@ import p.hh.jsontemplate.valueproducer.IValueProducer;
 import p.hh.jsontemplate.valueproducer.IntegerValueProducer;
 import p.hh.jsontemplate.valueproducer.StringValueProducer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
+    private boolean inTypeDef;
+    private String typeDefName;
+    private Map<String, JsonNode> typeMap = new HashMap<>();
+    private Map<String, List<JsonWrapperNode>> typeMissMap = new HashMap<>();
     private Map<String, IValueProducer> valueProducerMap = new HashMap<>();
+    private JsonBuilder jsonBuilder;
     private String currentPropertyName;
     private IValueProducer currentValueProducer;
 
-    public JsonBuilder getJsonBuilder() {
-        return jsonBuilder;
+    @Override
+    public void enterPropertyNameSpec(JsonTemplateParser.PropertyNameSpecContext ctx) {
+        ParseTree child = ctx.getChild(0);
+        if (child instanceof JsonTemplateParser.TypeInfoContext) {
+            if (inTypeDef) {
+                throw new IllegalStateException("Nested type definition is not allowed [" + child.getText() + "]");
+            } else {
+                inTypeDef = true;
+                jsonBuilder = new JsonBuilder();
+            }
+        }
     }
 
-    private JsonBuilder jsonBuilder;
+    @Override
+    public void enterTypeName(JsonTemplateParser.TypeNameContext ctx) {
+        if (inTypeDef) {
+            typeDefName = ctx.getText();
+        }
+    }
 
+    @Override
+    public void exitPropertyNameSpec(JsonTemplateParser.PropertyNameSpecContext ctx) {
+        if (inTypeDef) {
+            JsonNode jsonNode = jsonBuilder.end().build();
 
-    public JsonTemplateTreeListener() {
-        valueProducerMap.put("s", new StringValueProducer());
-        valueProducerMap.put("i", new IntegerValueProducer());
-        valueProducerMap.put("b", new BooleanValueProducer());
+            List<JsonWrapperNode> missTypeNodes = typeMissMap.get(typeDefName);
+            if (missTypeNodes != null) {
+                missTypeNodes.stream().forEach(wrapperNode -> wrapperNode.setJsonNode(jsonNode));
+                typeMissMap.remove(typeDefName);
+            }
+            typeMap.put(typeDefName, jsonNode);
+            inTypeDef = false;
+            typeDefName = null;
+            jsonBuilder = null;
+        }
     }
 
     @Override
     public void enterJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
-        if (jsonBuilder == null) {
-            jsonBuilder = new JsonBuilder();
-            jsonBuilder.createObject();
-        } else {
-            jsonBuilder.putObject(currentPropertyName);
+        if (inTypeDef) {
+            if (jsonBuilder == null) {
+                jsonBuilder = new JsonBuilder();
+                jsonBuilder.createObject();
+            } else {
+                jsonBuilder.putObject(currentPropertyName);
+            }
         }
     }
 
     @Override
     public void exitJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
-        jsonBuilder.end();
+        if (inTypeDef) {
+            jsonBuilder.end();
+        }
     }
 
     @Override
     public void enterJsonArray(JsonTemplateParser.JsonArrayContext ctx) {
-        if (jsonBuilder == null) {
-            jsonBuilder = new JsonBuilder();
-            jsonBuilder.createArray();
-        } else {
-            jsonBuilder.putArray(currentPropertyName);
+        if (inTypeDef) {
+            if (jsonBuilder == null) {
+                jsonBuilder = new JsonBuilder();
+                jsonBuilder.createArray();
+            } else {
+                jsonBuilder.putArray(currentPropertyName);
+            }
         }
     }
 
     @Override
     public void exitPropertyName(JsonTemplateParser.PropertyNameContext ctx) {
-        this.currentPropertyName = ctx.getText();
-        System.out.println("propertyName=" + this.currentPropertyName);
+        if (inTypeDef) {
+            this.currentPropertyName = ctx.getText();
+            System.out.println("propertyName=" + this.currentPropertyName);
+        }
     }
 
     @Override
     public void exitTypeName(JsonTemplateParser.TypeNameContext ctx) {
         String typeName = ctx.getText();
         currentValueProducer = valueProducerMap.get(typeName);
-        Class valueType = currentValueProducer.getValueType();
-        if (valueType.equals(Integer.class)) {
-            Supplier<Integer> supplier = () -> (Integer) currentValueProducer.produce(Collections.emptyMap());
+        if (currentValueProducer == null) {
+            JsonWrapperNode jsonWrapperNode = new JsonWrapperNode();
             if (jsonBuilder.inObject()) {
-                jsonBuilder.putInteger(currentPropertyName, supplier);
+                jsonBuilder.putWrapper(currentPropertyName, jsonWrapperNode);
             } else {
-                jsonBuilder.addInteger(supplier);
+                jsonBuilder.addWrapper(jsonWrapperNode);
             }
-        } else if (valueType.equals(Boolean.class)) {
-            Supplier<Boolean> supplier = () -> (Boolean) currentValueProducer.produce(Collections.emptyMap());
-            if (jsonBuilder.inObject()) {
-                jsonBuilder.putBoolean(currentPropertyName, supplier);
+            List<JsonWrapperNode> typeMissNodes = this.typeMissMap.get(typeName);
+            if (typeMissNodes == null) {
+                this.typeMissMap.put(typeName, Arrays.asList(jsonWrapperNode));
             } else {
-                jsonBuilder.addBoolean(supplier);
+                typeMissNodes.add(jsonWrapperNode);
             }
-        } else if (valueType.equals(String.class)) {
-            Supplier<String> supplier = () -> (String) currentValueProducer.produce(Collections.emptyMap());
-            if (jsonBuilder.inObject()) {
-                jsonBuilder.putString(currentPropertyName, supplier);
-            } else {
-                jsonBuilder.addString(supplier);
+        } else {
+            Class valueType = currentValueProducer.getValueType();
+            if (valueType.equals(Integer.class)) {
+                Supplier<Integer> supplier = () -> (Integer) currentValueProducer.produce(Collections.emptyMap());
+                buildJsonValue(supplier, jsonBuilder::putInteger, jsonBuilder::addInteger);
+
+            } else if (valueType.equals(Boolean.class)) {
+                Supplier<Boolean> supplier = () -> (Boolean) currentValueProducer.produce(Collections.emptyMap());
+                buildJsonValue(supplier, jsonBuilder::putBoolean, jsonBuilder::addBoolean);
+
+            } else if (valueType.equals(String.class)) {
+                Supplier<String> supplier = () -> (String) currentValueProducer.produce(Collections.emptyMap());
+                buildJsonValue(supplier, jsonBuilder::putString, jsonBuilder::addString);
             }
         }
     }
 
+    private <T> void buildJsonValue(Supplier<T> supplier, BiConsumer<String, Supplier<T>> putInObject, Consumer<Supplier<T>> addInArray) {
+        if (jsonBuilder.inObject()) {
+            putInObject.accept(currentPropertyName, supplier);
+        } else {
+            addInArray.accept(supplier);
+        }
+    }
 }

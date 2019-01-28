@@ -57,6 +57,11 @@ public class JsonBuilder {
         return this;
     }
 
+    public JsonBuilder putWrapper(String key, JsonWrapperNode wrapperNode) {
+        ((JsonObjectNode) nodeStack.peek()).putWrapper(key, wrapperNode);
+        return this;
+    }
+
     public JsonBuilder putNull(String key) {
         ((JsonObjectNode) nodeStack.peek()).putNull(key);
         return this;
@@ -93,6 +98,11 @@ public class JsonBuilder {
 
     public JsonBuilder addString(Supplier<String> supplier) {
         ((JsonArrayNode) nodeStack.peek()).addString(supplier);
+        return this;
+    }
+
+    public JsonBuilder addWrapper(JsonWrapperNode wrapperNode) {
+        ((JsonArrayNode) nodeStack.peek()).addWrapper(wrapperNode);
         return this;
     }
 
