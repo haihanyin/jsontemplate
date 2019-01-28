@@ -24,12 +24,17 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     private Map<String, List<JsonWrapperNode>> typeMissMap = new HashMap<>();
     private Map<String, IValueProducer> valueProducerMap = new HashMap<>();
     private JsonBuilder jsonBuilder;
+    private JsonBuilder typeBuilder;
 
     private TypeDefinition curTypeDef;
-    private Stack<ValueDeclaration> valueDeclarationStack = new Stack<>();
+    private ValueDeclaration curValueDecl;
 
     public JsonTemplateTreeListener() {
         setupValueProducerMap();
+    }
+
+    public String writeJson() {
+        return jsonBuilder.build().prettyPrint(0);
     }
 
     protected void setupValueProducerMap() {
@@ -46,23 +51,26 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 throw new IllegalStateException("Nested type definition is not allowed [" + child.getText() + "]");
             } else {
                 curTypeDef = new TypeDefinition(ctx);
+                typeBuilder.createObject();
             }
+        } else {
+            curValueDecl = new ValueDeclaration();
         }
     }
 
     @Override
     public void exitPairProperty(JsonTemplateParser.PairPropertyContext ctx) {
-        if (curTypeDef != null && curTypeDef.getTypeDefContext() == ctx) {
-            JsonNode jsonNode = jsonBuilder.build();
+        if (inTypeDefContext() && curTypeDef.getTypeDefContext() == ctx) {
+            JsonNode typeNode = typeBuilder.end().build();
             String typeDefName = curTypeDef.getTypeName();
-            typeMap.put(typeDefName, jsonNode);
+            typeMap.put(typeDefName, typeNode);
 
             List<JsonWrapperNode> missTypeNodes = typeMissMap.get(typeDefName);
             if (missTypeNodes != null) {
-                missTypeNodes.stream().forEach(wrapperNode -> wrapperNode.setJsonNode(jsonNode));
+                missTypeNodes.stream().forEach(wrapperNode -> wrapperNode.setJsonNode(typeNode));
                 typeMissMap.remove(typeDefName);
             }
-            typeMap.put(typeDefName, jsonNode);
+            typeMap.put(typeDefName, typeNode);
             curTypeDef = null;
         }
     }
@@ -71,7 +79,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     public void enterMapParam(JsonTemplateParser.MapParamContext ctx) {
         String key = ctx.getChild(0).getText();
         String value = ctx.getChild(2).getText();
-        valueDeclarationStack.peek().putMapParam(key, value);
+        curValueDecl.putMapParam(key, value);
     }
 
     @Override
@@ -80,25 +88,31 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 .mapToObj(ctx::getChild)
                 .map(ParseTree::getText)
                 .filter(text -> !",".equals(text))
-                .forEach(valueDeclarationStack.peek()::addListParam);
+                .forEach(curValueDecl::addListParam);
+    }
+
+
+    @Override
+    public void enterPropertyName(JsonTemplateParser.PropertyNameContext ctx) {
+        curValueDecl.setValueName(ctx.getText());
     }
 
     @Override
     public void enterTypeName(JsonTemplateParser.TypeNameContext ctx) {
-        if (curTypeDef != null) {
+        if (inTypeDefContext()) {
             curTypeDef.setTypeName(ctx.getText());
         } else {
-            currentPropertyName = ctx.getText();
+            curValueDecl.setTypeName(ctx.getText());
         }
     }
 
     @Override
     public void enterJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
-        if (jsonBuilder == null) {
-            jsonBuilder = new JsonBuilder();
-            jsonBuilder.createObject();
+        JsonBuilder builder = chooseBuilder();
+        if (builder == null) {
+            builder = new JsonBuilder().createObject();
         } else {
-            jsonBuilder.putObject(currentPropertyName);
+            builder.putObject(ctx.getText());
         }
     }
 
@@ -109,55 +123,53 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterJsonArray(JsonTemplateParser.JsonArrayContext ctx) {
-        if (jsonBuilder == null) {
-            jsonBuilder = new JsonBuilder();
-            jsonBuilder.createArray();
+        JsonBuilder builder = chooseBuilder();
+        if (builder == null) {
+            builder = new JsonBuilder().createArray();
         } else {
-            jsonBuilder.putArray(currentPropertyName);
+            jsonBuilder.putArray(curValueDecl.getValueName());
         }
     }
 
     @Override
-    public void exitPropertyValueSpec(JsonTemplateParser.PropertyValueSpecContext ctx) {
-        String typeName = valueDeclarationStack.getTypeName();
+    public void exitJsonValue(JsonTemplateParser.JsonValueContext ctx) {
+        String typeName = curValueDecl.getTypeName();
         IValueProducer valueProducer = valueProducerMap.get(typeName);
+        JsonBuilder builder = chooseBuilder();
         if (valueProducer == null) {
-            buildJsonUnlinkedNode(typeName);
+            buildJsonUnlinkedNode(builder, typeName);
         } else {
-            buildJsonValueNode(valueProducer);
+            buildJsonValueNode(builder, valueProducer);
         }
     }
 
-    @Override
-    public void exitTypeName(JsonTemplateParser.TypeNameContext ctx) {
-        String typeName = valueDeclarationStack.getTypeName();
-        IValueProducer valueProducer = valueProducerMap.get(typeName);
-        if (valueProducer == null) {
-            buildJsonUnlinkedNode(typeName);
-        } else {
-            buildJsonValueNode(valueProducer);
-        }
+    private boolean inTypeDefContext() {
+        return  curTypeDef != null;
     }
 
-    private void buildJsonValueNode(IValueProducer valueProducer) {
+    private JsonBuilder chooseBuilder() {
+        return inTypeDefContext() ? typeBuilder : jsonBuilder;
+    }
+
+    private void buildJsonValueNode(JsonBuilder builder, IValueProducer valueProducer) {
         Class valueType = valueProducer.getValueType();
         if (valueType.equals(Integer.class)) {
-            buildJsonValue(createSupplier(valueProducer), jsonBuilder::putInteger, jsonBuilder::addInteger);
+            buildJsonValue(createSupplier(valueProducer), builder::putInteger, builder::addInteger);
 
         } else if (valueType.equals(Boolean.class)) {
-            buildJsonValue(createSupplier(valueProducer), jsonBuilder::putBoolean, jsonBuilder::addBoolean);
+            buildJsonValue(createSupplier(valueProducer), builder::putBoolean, builder::addBoolean);
 
         } else if (valueType.equals(String.class)) {
-            buildJsonValue(createSupplier(valueProducer), jsonBuilder::putString, jsonBuilder::addString);
+            buildJsonValue(createSupplier(valueProducer), builder::putString, builder::addString);
         }
     }
 
-    private void buildJsonUnlinkedNode(String typeName) {
+    private void buildJsonUnlinkedNode(JsonBuilder builder, String typeName) {
         JsonWrapperNode jsonWrapperNode = new JsonWrapperNode();
-        if (jsonBuilder.inObject()) {
-            jsonBuilder.putWrapper(currentPropertyName, jsonWrapperNode);
+        if (builder.inObject()) {
+            builder.putWrapper(curValueDecl.getValueName(), jsonWrapperNode);
         } else {
-            jsonBuilder.addWrapper(jsonWrapperNode);
+            builder.addWrapper(jsonWrapperNode);
         }
         List<JsonWrapperNode> typeMissNodes = this.typeMissMap.get(typeName);
         if (typeMissNodes == null) {
@@ -169,19 +181,19 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     private <T> Supplier<T> createSupplier(IValueProducer<T> valueProducer) {
         Supplier<T> supplier  = () -> (T) valueProducer.produce(Collections.emptyMap());
-        if (valueDeclarationStack.getSingleParam() != null) {
-            supplier = () -> (T) valueProducer.produce(valueDeclarationStack.getSingleParam());
-        } else if (valueDeclarationStack.getListParam() != null) {
-            supplier = () -> (T) valueProducer.produce(valueDeclarationStack.getListParam());
-        } else if (valueDeclarationStack.getMapParam() != null) {
-            supplier = () -> (T) valueProducer.produce(valueDeclarationStack.getMapParam());
+        if (curValueDecl.getSingleParam() != null) {
+            supplier = () -> (T) valueProducer.produce(curValueDecl.getSingleParam());
+        } else if (curValueDecl.getListParam() != null) {
+            supplier = () -> (T) valueProducer.produce(curValueDecl.getListParam());
+        } else if (curValueDecl.getMapParam() != null) {
+            supplier = () -> (T) valueProducer.produce(curValueDecl.getMapParam());
         }
         return supplier;
     }
 
     private <T> void buildJsonValue(Supplier<T> supplier, BiConsumer<String, Supplier<T>> putInObject, Consumer<Supplier<T>> addInArray) {
         if (jsonBuilder.inObject()) {
-            putInObject.accept(currentPropertyName, supplier);
+            putInObject.accept(curValueDecl.getValueName(), supplier);
         } else {
             addInArray.accept(supplier);
         }
