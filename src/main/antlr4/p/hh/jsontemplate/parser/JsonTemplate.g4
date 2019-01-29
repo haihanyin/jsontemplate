@@ -19,12 +19,11 @@ listParams : IDENTIFIER (',' IDENTIFIER)+;
 mapParams : mapParam (',' mapParam)*;
 mapParam : IDENTIFIER '=' IDENTIFIER;
 
-jsonArray : itemsArray | genericArray;
-itemsArray : '[' items ']' jsonValue?;
+jsonArray : jsonValue? itemsArray ;
+itemsArray : '[' items? ']' typeParamSpec?;
 items : item (',' item)*;
 item : jsonValue | variable | value;
 value : IDENTIFIER;
-genericArray : '[]' typeParamSpec? propertyValueSpec;
 
 variable : '$'variableName;
 variableName : IDENTIFIER;
