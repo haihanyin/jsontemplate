@@ -18,8 +18,4 @@ public class TestUtils {
         System.out.println(json);
         return JsonPath.parse(json);
     }
-
-    public static void exist(DocumentContext document, String path, Class type) {
-        assertThat(document.read(path, type), is(notNullValue()));
-    }
 }

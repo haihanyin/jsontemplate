@@ -7,6 +7,9 @@ import p.hh.jsontemplate.jsoncomposer.JsonNode;
 import p.hh.jsontemplate.jsoncomposer.JsonWrapperNode;
 import p.hh.jsontemplate.parser.JsonTemplateBaseListener;
 import p.hh.jsontemplate.parser.JsonTemplateParser;
+import p.hh.jsontemplate.supplier.ListParamSupplier;
+import p.hh.jsontemplate.supplier.MapParamSupplier;
+import p.hh.jsontemplate.supplier.SingleParamSupplier;
 import p.hh.jsontemplate.valueproducer.BooleanValueProducer;
 import p.hh.jsontemplate.valueproducer.IValueProducer;
 import p.hh.jsontemplate.valueproducer.IntegerValueProducer;
@@ -201,17 +204,16 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         } else {
             builder.addWrapper(jsonWrapperNode);
         }
-        System.out.println();
     }
 
     private <T> Supplier<T> createSupplier(IValueProducer<T> valueProducer) {
         Supplier<T> supplier  = () -> (T) valueProducer.produce();
         if (curValueDecl.getSingleParam() != null) {
-            supplier = (new String(curValueDecl.getSingleParam())) -> (T) valueProducer.produce();
+            supplier = new SingleParamSupplier<>(valueProducer, curValueDecl.getSingleParam());
         } else if (curValueDecl.getListParam() != null) {
-            supplier = (new ArrayList<>(curValueDecl.getListParam())) -> (T) valueProducer.produce(new ArrayList<>());
+            supplier = new ListParamSupplier<>(valueProducer, new ArrayList<>(curValueDecl.getListParam()));
         } else if (curValueDecl.getMapParam() != null) {
-            supplier = (new HashMap<>(curValueDecl.getMapParam()) -> valueProducer.produce(new ArrayList<>());;
+            supplier = new MapParamSupplier<>(valueProducer, new HashMap<>(curValueDecl.getMapParam()));
         }
         return supplier;
     }

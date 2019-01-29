@@ -8,7 +8,6 @@ import org.junit.runners.JUnit4;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static p.hh.jsontemplate.test.support.TestUtils.exist;
 import static p.hh.jsontemplate.test.support.TestUtils.parse;
 
 @RunWith(JUnit4.class)
@@ -17,7 +16,7 @@ public class JsonTemplateIntegerTest {
     @Test
     public void test_randomIntegerField() {
         DocumentContext document = parse("{aField : %i}");
-        exist(document, "$.aField", Integer.class);
+        assertThat(document.read("$.aField", Integer.class), is(notNullValue()));
     }
 
     @Test
