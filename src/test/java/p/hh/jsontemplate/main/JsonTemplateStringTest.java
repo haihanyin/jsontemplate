@@ -11,7 +11,7 @@ import org.junit.runners.JUnit4;
 import static p.hh.jsontemplate.test.support.TestUtils.*;
 
 @RunWith(JUnit4.class)
-public class JsonTemplateTest {
+public class JsonTemplateStringTest {
 
     private static final int STRING_LENGTH = 5;
 
@@ -53,10 +53,9 @@ public class JsonTemplateTest {
                 greaterThanOrEqualTo(10), lessThanOrEqualTo(20)));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void test_invalidParamStringField() {
-        DocumentContext document = parse("{aField : %s(length=20)}");
-        assertThat(document.read("$.aField", String.class).length(), is(5));
+        parse("{aField : %s(length=20)}");
     }
 
 }

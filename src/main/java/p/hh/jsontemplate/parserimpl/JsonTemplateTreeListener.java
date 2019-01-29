@@ -1,5 +1,6 @@
 package p.hh.jsontemplate.parserimpl;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import p.hh.jsontemplate.jsoncomposer.JsonBuilder;
 import p.hh.jsontemplate.jsoncomposer.JsonNode;
@@ -29,6 +30,8 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     private TypeDefinition curTypeDef;
     private ValueDeclaration curValueDecl;
 
+    private boolean debug = true;
+
     public JsonTemplateTreeListener() {
         setupValueProducerMap();
     }
@@ -45,13 +48,13 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterPairProperty(JsonTemplateParser.PairPropertyContext ctx) {
+        debug("enterPairProperty ", ctx);
         ParseTree child = ctx.getChild(0).getChild(0);
         if (child instanceof JsonTemplateParser.TypeInfoContext) {
             if (curTypeDef != null) {
                 throw new IllegalStateException("Nested type definition is not allowed [" + child.getText() + "]");
             } else {
                 curTypeDef = new TypeDefinition(ctx);
-                typeBuilder.createObject();
             }
         } else {
             curValueDecl = new ValueDeclaration();
@@ -60,8 +63,10 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void exitPairProperty(JsonTemplateParser.PairPropertyContext ctx) {
-        if (inTypeDefContext() && curTypeDef.getTypeDefContext() == ctx) {
-            JsonNode typeNode = typeBuilder.end().build();
+        debug("exitPairProerty ", ctx);
+        ParseTree child = ctx.getChild(0).getChild(0);
+        if (inTypeDefContext() && child instanceof JsonTemplateParser.TypeInfoContext) {
+            JsonNode typeNode = typeBuilder.build();
             String typeDefName = curTypeDef.getTypeName();
             typeMap.put(typeDefName, typeNode);
 
@@ -72,11 +77,13 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
             }
             typeMap.put(typeDefName, typeNode);
             curTypeDef = null;
+            typeBuilder = null;
         }
     }
 
     @Override
     public void enterMapParam(JsonTemplateParser.MapParamContext ctx) {
+        debug("enterMapParam", ctx);
         String key = ctx.getChild(0).getText();
         String value = ctx.getChild(2).getText();
         curValueDecl.putMapParam(key, value);
@@ -84,6 +91,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterListParams(JsonTemplateParser.ListParamsContext ctx) {
+        debug("enterListParams", ctx);
         IntStream.range(0, ctx.getChildCount())
                 .mapToObj(ctx::getChild)
                 .map(ParseTree::getText)
@@ -93,17 +101,20 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterSingleParam(JsonTemplateParser.SingleParamContext ctx) {
+        debug("enterSingleParam", ctx);
         curValueDecl.setSingleParam(ctx.getText());
     }
 
     @Override
     public void enterPropertyName(JsonTemplateParser.PropertyNameContext ctx) {
+        debug("enterPropertyName", ctx);
         curValueDecl.setValueName(ctx.getText());
     }
 
     @Override
     public void enterTypeName(JsonTemplateParser.TypeNameContext ctx) {
-        if (inTypeDefContext()) {
+        debug("enterTypeName", ctx);
+        if (inTypeDefContext() && curTypeDef.getTypeName() == null) {
             curTypeDef.setTypeName(ctx.getText());
         } else {
             curValueDecl.setTypeName(ctx.getText());
@@ -112,19 +123,27 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
+        debug("enterJsonObject", ctx);
         JsonBuilder builder = chooseBuilder();
         if (builder == null) {
             createBuilder().createObject();
         } else {
-            builder.putObject(ctx.getText());
+            builder.putObject(curValueDecl.getValueName());
         }
+        System.out.println();
     }
 
     private JsonBuilder createBuilder() {
         if (inTypeDefContext()) {
+            if (debug) {
+                System.out.println("-- create type builder");
+            }
             typeBuilder = new JsonBuilder();
             return typeBuilder;
         } else {
+            if (debug) {
+                System.out.println("-- create json builder");
+            }
             jsonBuilder = new JsonBuilder();
             return jsonBuilder;
         }
@@ -132,7 +151,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void exitJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
-        jsonBuilder.end();
+        chooseBuilder().end();
     }
 
     @Override
@@ -141,8 +160,9 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         if (builder == null) {
             createBuilder().createArray();
         } else {
-            jsonBuilder.putArray(curValueDecl.getValueName());
+            builder.putArray(curValueDecl.getValueName());
         }
+        builder.createObject();
     }
 
     @Override
@@ -151,7 +171,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         IValueProducer valueProducer = valueProducerMap.get(typeName);
         JsonBuilder builder = chooseBuilder();
         if (valueProducer == null) {
-            buildJsonUnlinkedNode(builder, typeName);
+            buildJsonWrapperNode(builder, typeName);
         } else {
             buildJsonValueNode(builder, valueProducer);
         }
@@ -178,23 +198,29 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         }
     }
 
-    private void buildJsonUnlinkedNode(JsonBuilder builder, String typeName) {
+    private void buildJsonWrapperNode(JsonBuilder builder, String typeName) {
         JsonWrapperNode jsonWrapperNode = new JsonWrapperNode();
+        JsonNode type = typeMap.get(typeName);
+        if (type != null) {
+            jsonWrapperNode.setJsonNode(type);
+        } else {
+            List<JsonWrapperNode> typeMissNodes = this.typeMissMap.get(typeName);
+            if (typeMissNodes == null) {
+                this.typeMissMap.put(typeName, Arrays.asList(jsonWrapperNode));
+            } else {
+                typeMissNodes.add(jsonWrapperNode);
+            }
+        }
+
         if (builder.inObject()) {
             builder.putWrapper(curValueDecl.getValueName(), jsonWrapperNode);
         } else {
             builder.addWrapper(jsonWrapperNode);
         }
-        List<JsonWrapperNode> typeMissNodes = this.typeMissMap.get(typeName);
-        if (typeMissNodes == null) {
-            this.typeMissMap.put(typeName, Arrays.asList(jsonWrapperNode));
-        } else {
-            typeMissNodes.add(jsonWrapperNode);
-        }
     }
 
     private <T> Supplier<T> createSupplier(IValueProducer<T> valueProducer) {
-        Supplier<T> supplier  = () -> (T) valueProducer.produce(Collections.emptyMap());
+        Supplier<T> supplier  = () -> (T) valueProducer.produce();
         if (curValueDecl.getSingleParam() != null) {
             supplier = () -> (T) valueProducer.produce(curValueDecl.getSingleParam());
         } else if (curValueDecl.getListParam() != null) {
@@ -210,6 +236,12 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
             putInObject.accept(curValueDecl.getValueName(), supplier);
         } else {
             addInArray.accept(supplier);
+        }
+    }
+
+    private void debug(String message, ParserRuleContext ctx) {
+        if (debug) {
+            System.out.println(message + " " + ctx.getText());
         }
     }
 }

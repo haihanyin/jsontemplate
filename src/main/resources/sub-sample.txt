@@ -8,11 +8,11 @@
 
     aVariableStringField : $name,
 
-    aArrayFieldWithStringElements : [] %s,
-    aArrayFieldWithStringElements2 : [] %s(myValue),
-    aArrayFieldWithStringElements3 : [](size=6) %s,
+    aArrayFieldWithStringElements : %s[],
+    aArrayFieldWithStringElements2 : %s(myValue)[],
+    aArrayFieldWithStringElements3 : %s[](size=6),
     aArrayFieldWithStringElements4 : [%s, %i, %b, %Email, $name],
-    aArrayFieldWithStringElements4 : [1, 2, %i(3), 4, 5] %s,
+    aArrayFieldWithStringElements4 : %s[1, 2, %i(3), 4, 5],
     aObjectField : {
         objIntegerField : %d
     },

@@ -37,9 +37,11 @@ public class StringValueProducer extends AbstractValueProducer<String> {
 
     @Override
     public String produce(Map<String, String> paramMap) {
-        Integer size = getIntegerParam(paramMap, "size");
-        Integer min = getIntegerParam(paramMap, "min");
-        Integer max = getIntegerParam(paramMap, "max");
+        Integer size = pickIntegerParam(paramMap, "size");
+        Integer min = pickIntegerParam(paramMap, "min");
+        Integer max = pickIntegerParam(paramMap, "max");
+
+        validateParamMap(paramMap);
 
         if (size != null) {
             return produceString(size);
