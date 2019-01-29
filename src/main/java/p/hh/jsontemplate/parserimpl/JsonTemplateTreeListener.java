@@ -34,6 +34,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     public JsonTemplateTreeListener() {
         setupValueProducerMap();
+        jsonBuilder = new JsonBuilder();
     }
 
     public String writeJson() {
@@ -55,10 +56,10 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 throw new IllegalStateException("Nested type definition is not allowed [" + child.getText() + "]");
             } else {
                 curTypeDef = new TypeDefinition(ctx);
+                typeBuilder = new JsonBuilder();
             }
-        } else {
-            curValueDecl = new ValueDeclaration();
         }
+        curValueDecl = new ValueDeclaration();
     }
 
     @Override
@@ -125,28 +126,12 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     public void enterJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
         debug("enterJsonObject", ctx);
         JsonBuilder builder = chooseBuilder();
-        if (builder == null) {
-            createBuilder().createObject();
+        if (builder.isEmpty()) {
+            builder.createObject();
         } else {
             builder.putObject(curValueDecl.getValueName());
         }
         System.out.println();
-    }
-
-    private JsonBuilder createBuilder() {
-        if (inTypeDefContext()) {
-            if (debug) {
-                System.out.println("-- create type builder");
-            }
-            typeBuilder = new JsonBuilder();
-            return typeBuilder;
-        } else {
-            if (debug) {
-                System.out.println("-- create json builder");
-            }
-            jsonBuilder = new JsonBuilder();
-            return jsonBuilder;
-        }
     }
 
     @Override
@@ -157,12 +142,11 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     @Override
     public void enterJsonArray(JsonTemplateParser.JsonArrayContext ctx) {
         JsonBuilder builder = chooseBuilder();
-        if (builder == null) {
-            createBuilder().createArray();
+        if (builder.isEmpty()) {
+            builder.createArray();
         } else {
             builder.putArray(curValueDecl.getValueName());
         }
-        builder.createObject();
     }
 
     @Override
@@ -217,22 +201,23 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         } else {
             builder.addWrapper(jsonWrapperNode);
         }
+        System.out.println();
     }
 
     private <T> Supplier<T> createSupplier(IValueProducer<T> valueProducer) {
         Supplier<T> supplier  = () -> (T) valueProducer.produce();
         if (curValueDecl.getSingleParam() != null) {
-            supplier = () -> (T) valueProducer.produce(curValueDecl.getSingleParam());
+            supplier = (new String(curValueDecl.getSingleParam())) -> (T) valueProducer.produce();
         } else if (curValueDecl.getListParam() != null) {
-            supplier = () -> (T) valueProducer.produce(curValueDecl.getListParam());
+            supplier = (new ArrayList<>(curValueDecl.getListParam())) -> (T) valueProducer.produce(new ArrayList<>());
         } else if (curValueDecl.getMapParam() != null) {
-            supplier = () -> (T) valueProducer.produce(curValueDecl.getMapParam());
+            supplier = (new HashMap<>(curValueDecl.getMapParam()) -> valueProducer.produce(new ArrayList<>());;
         }
         return supplier;
     }
 
     private <T> void buildJsonValue(Supplier<T> supplier, BiConsumer<String, Supplier<T>> putInObject, Consumer<Supplier<T>> addInArray) {
-        if (jsonBuilder.inObject()) {
+        if (chooseBuilder().inObject()) {
             putInObject.accept(curValueDecl.getValueName(), supplier);
         } else {
             addInArray.accept(supplier);

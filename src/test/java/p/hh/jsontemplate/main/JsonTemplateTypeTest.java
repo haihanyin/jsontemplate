@@ -13,11 +13,12 @@ import static p.hh.jsontemplate.test.support.TestUtils.*;
 @RunWith(JUnit4.class)
 public class JsonTemplateTypeTest {
 
+
     @Test
     public void test_twoLevelObject() {
         DocumentContext document = parse("{" +
-                    "%address:{city:%s,street:%s,number:%i}," +
-                    "office:%address, home:%address" +
+                    "%address:{city:%s,street:%s(A),number:%i},%address2:{city:%s(B)}," +
+                    "office:%address, home:%address2" +
                 "}");
         exist(document, "$.office.city", String.class);
         exist(document, "$.office.street", String.class);

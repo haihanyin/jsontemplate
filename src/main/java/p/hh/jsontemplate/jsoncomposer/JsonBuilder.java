@@ -111,6 +111,10 @@ public class JsonBuilder {
         return this;
     }
 
+    public boolean isEmpty() {
+        return nodeStack.isEmpty();
+    }
+
     public boolean inObject() {
         return nodeStack.peek() instanceof JsonObjectNode;
     }

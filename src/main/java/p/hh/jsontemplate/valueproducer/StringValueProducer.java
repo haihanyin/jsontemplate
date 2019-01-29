@@ -11,9 +11,6 @@ public class StringValueProducer extends AbstractValueProducer<String> {
     private final static String ALPHABETIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private final static int DEFAULT_LENGTH = 5;
 
-    private Integer size;
-    private Integer min;
-    private Integer max;
 
     @Override
     public Class<String> getValueType() {
