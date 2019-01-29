@@ -84,13 +84,17 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterListParams(JsonTemplateParser.ListParamsContext ctx) {
-        IntStream.of(ctx.getChildCount())
+        IntStream.range(0, ctx.getChildCount())
                 .mapToObj(ctx::getChild)
                 .map(ParseTree::getText)
                 .filter(text -> !",".equals(text))
                 .forEach(curValueDecl::addListParam);
     }
 
+    @Override
+    public void enterSingleParam(JsonTemplateParser.SingleParamContext ctx) {
+        curValueDecl.setSingleParam(ctx.getText());
+    }
 
     @Override
     public void enterPropertyName(JsonTemplateParser.PropertyNameContext ctx) {
@@ -110,9 +114,19 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     public void enterJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
         JsonBuilder builder = chooseBuilder();
         if (builder == null) {
-            builder = new JsonBuilder().createObject();
+            createBuilder().createObject();
         } else {
             builder.putObject(ctx.getText());
+        }
+    }
+
+    private JsonBuilder createBuilder() {
+        if (inTypeDefContext()) {
+            typeBuilder = new JsonBuilder();
+            return typeBuilder;
+        } else {
+            jsonBuilder = new JsonBuilder();
+            return jsonBuilder;
         }
     }
 
@@ -125,7 +139,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     public void enterJsonArray(JsonTemplateParser.JsonArrayContext ctx) {
         JsonBuilder builder = chooseBuilder();
         if (builder == null) {
-            builder = new JsonBuilder().createArray();
+            createBuilder().createArray();
         } else {
             jsonBuilder.putArray(curValueDecl.getValueName());
         }

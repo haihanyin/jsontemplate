@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
 
     @Override
+    public T produce() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public T produce(String value) {
         throw new UnsupportedOperationException();
     }
@@ -83,5 +88,10 @@ public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
 
     protected  <R> R defaultIfNull(R object, R defaultValue) {
         return object != null ? object : defaultValue;
+    }
+
+    protected int randomInRange(int min, int max) {
+        int bound = max - min + 1;
+        return new Random().nextInt(bound) + min;
     }
 }
