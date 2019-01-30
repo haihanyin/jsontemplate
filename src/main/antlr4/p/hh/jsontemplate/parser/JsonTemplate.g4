@@ -5,13 +5,14 @@ jsonObject : '{' properties '}';
 properties : property (',' property)*;
 property : pairProperty;
 pairProperty : propertyNameSpec ':' propertyValueSpec;
-propertyNameSpec : propertyName | typeInfo ;
+propertyNameSpec : propertyName | typeDef ;
 propertyName : IDENTIFIER;
-typeInfo : '%'typeName;
+typeDef : '%'typeName;
 typeName : IDENTIFIER;
 
 propertyValueSpec : jsonValue | jsonArray | jsonObject | variable;
 jsonValue : typeInfo typeParamSpec?;
+typeInfo : '%'typeName;
 
 typeParamSpec : '(' singleParam ')' | '(' listParams ')' | '(' mapParams ')';
 singleParam : IDENTIFIER;
