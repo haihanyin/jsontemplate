@@ -133,6 +133,10 @@ public class JsonBuilder {
         return nodeStack.peek() instanceof JsonArrayNode;
     }
 
+    public JsonArrayNode peekArrayNode() {
+        return ((JsonArrayNode) nodeStack.peek());
+    }
+
     public JsonNode build() {
         if (!nodeStack.empty()) {
             throw new IllegalStateException("Json is not build on root node");

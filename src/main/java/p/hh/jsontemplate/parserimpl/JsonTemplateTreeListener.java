@@ -91,6 +91,20 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     @Override
+    public void enterMapParams(JsonTemplateParser.MapParamsContext ctx) {
+        if (inItemsArray) {
+            curValueDecl = new ValueDeclaration();
+        }
+    }
+
+    @Override
+    public void exitMapParams(JsonTemplateParser.MapParamsContext ctx) {
+        if (inItemsArray) {
+            chooseBuilder().peekArrayNode().setParameters(curValueDecl.getMapParam());
+        }
+    }
+
+    @Override
     public void enterListParams(JsonTemplateParser.ListParamsContext ctx) {
         debug("enterListParams", ctx);
         IntStream.range(0, ctx.getChildCount())
@@ -156,9 +170,16 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         chooseBuilder().end();
     }
 
+    private boolean inArrayTypeInfo;
+
     @Override
     public void enterArrayTypeInfo(JsonTemplateParser.ArrayTypeInfoContext ctx) {
+        inArrayTypeInfo = true;
+    }
 
+    @Override
+    public void exitArrayTypeInfo(JsonTemplateParser.ArrayTypeInfoContext ctx) {
+        inArrayTypeInfo = false;
     }
 
     @Override
@@ -170,6 +191,27 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         } else {
             buildJsonValueNode(valueProducer);
         }
+    }
+
+    @Override
+    public void enterValue(JsonTemplateParser.ValueContext ctx) {
+        JsonBuilder builder = chooseBuilder();
+        INodeProducer nodeProducer = builder.peekArrayNode().getDefaultType();
+        JsonNode node = nodeProducer.produce(ctx.getText());
+        builder.addNode(node);
+    }
+
+
+    private boolean inItemsArray;
+
+    @Override
+    public void enterItemsArray(JsonTemplateParser.ItemsArrayContext ctx) {
+        inItemsArray = true;
+    }
+
+    @Override
+    public void exitItemsArray(JsonTemplateParser.ItemsArrayContext ctx) {
+        inItemsArray = false;
     }
 
     private boolean inTypeDefContext() {
@@ -195,6 +237,9 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
             jsonNode = valueProducer.produce(curValueDecl.getMapParam());
         } else {
             jsonNode = valueProducer.produce();
+            if (inArrayTypeInfo) {
+                chooseBuilder().peekArrayNode().setNodeProducer(valueProducer);
+            }
         }
         return jsonNode;
     }
@@ -215,6 +260,8 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         JsonBuilder builder = chooseBuilder();
         if (builder.inObject()) {
             builder.putWrapper(curValueDecl.getValueName(), jsonWrapperNode);
+        } else if (inArrayTypeInfo) {
+            builder.peekArrayNode().setDefaultNode(jsonWrapperNode);
         } else {
             builder.addWrapper(jsonWrapperNode);
         }
@@ -224,6 +271,8 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         JsonBuilder builder = chooseBuilder();
         if (builder.inObject()) {
             builder.putNode(curValueDecl.getValueName(), jsonNode);
+        } else if (inArrayTypeInfo) {
+            builder.peekArrayNode().setDefaultNode(jsonNode);
         } else {
             builder.addNode(jsonNode);
         }
