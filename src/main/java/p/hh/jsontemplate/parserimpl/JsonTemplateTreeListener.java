@@ -7,13 +7,10 @@ import p.hh.jsontemplate.jsoncomposer.JsonNode;
 import p.hh.jsontemplate.jsoncomposer.JsonWrapperNode;
 import p.hh.jsontemplate.parser.JsonTemplateBaseListener;
 import p.hh.jsontemplate.parser.JsonTemplateParser;
-import p.hh.jsontemplate.supplier.ListParamSupplier;
-import p.hh.jsontemplate.supplier.MapParamSupplier;
-import p.hh.jsontemplate.supplier.SingleParamSupplier;
-import p.hh.jsontemplate.valueproducer.BooleanValueProducer;
-import p.hh.jsontemplate.valueproducer.IValueProducer;
-import p.hh.jsontemplate.valueproducer.IntegerValueProducer;
-import p.hh.jsontemplate.valueproducer.StringValueProducer;
+import p.hh.jsontemplate.valueproducer.BooleanNodeProducer;
+import p.hh.jsontemplate.valueproducer.INodeProducer;
+import p.hh.jsontemplate.valueproducer.IntegerNodeProducer;
+import p.hh.jsontemplate.valueproducer.StringNodeProducer;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -26,7 +23,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     private Map<String, JsonNode> typeMap = new HashMap<>();
     private Map<String, List<JsonWrapperNode>> typeMissMap = new HashMap<>();
-    private Map<String, IValueProducer> valueProducerMap = new HashMap<>();
+    private Map<String, INodeProducer> valueProducerMap = new HashMap<>();
     private JsonBuilder jsonBuilder;
     private JsonBuilder typeBuilder;
 
@@ -45,9 +42,9 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     protected void setupValueProducerMap() {
-        valueProducerMap.put("s", new StringValueProducer());
-        valueProducerMap.put("i", new IntegerValueProducer());
-        valueProducerMap.put("b", new BooleanValueProducer());
+        valueProducerMap.put("s", new StringNodeProducer());
+        valueProducerMap.put("i", new IntegerNodeProducer());
+        valueProducerMap.put("b", new BooleanNodeProducer());
     }
 
     @Override
@@ -155,12 +152,11 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     @Override
     public void exitJsonValue(JsonTemplateParser.JsonValueContext ctx) {
         String typeName = curValueDecl.getTypeName();
-        IValueProducer valueProducer = valueProducerMap.get(typeName);
-        JsonBuilder builder = chooseBuilder();
+        INodeProducer valueProducer = valueProducerMap.get(typeName);
         if (valueProducer == null) {
-            buildJsonWrapperNode(builder, typeName);
+            buildJsonWrapperNode(typeName);
         } else {
-            buildJsonValueNode(builder, valueProducer);
+            buildJsonValueNode(valueProducer);
         }
     }
 
@@ -172,20 +168,26 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         return inTypeDefContext() ? typeBuilder : jsonBuilder;
     }
 
-    private void buildJsonValueNode(JsonBuilder builder, IValueProducer valueProducer) {
-        Class valueType = valueProducer.getValueType();
-        if (valueType.equals(Integer.class)) {
-            buildJsonValue(createSupplier(valueProducer), builder::putInteger, builder::addInteger);
-
-        } else if (valueType.equals(Boolean.class)) {
-            buildJsonValue(createSupplier(valueProducer), builder::putBoolean, builder::addBoolean);
-
-        } else if (valueType.equals(String.class)) {
-            buildJsonValue(createSupplier(valueProducer), builder::putString, builder::addString);
-        }
+    private void buildJsonValueNode(INodeProducer valueProducer) {
+        JsonNode jsonNode = createJsonValueNode(valueProducer);
+        buildJsonValue(jsonNode);
     }
 
-    private void buildJsonWrapperNode(JsonBuilder builder, String typeName) {
+    private JsonNode createJsonValueNode(INodeProducer valueProducer) {
+        JsonNode jsonNode = null;
+        if (curValueDecl.getSingleParam() != null) {
+            jsonNode = valueProducer.produce(curValueDecl.getSingleParam());
+        } else if (curValueDecl.getListParam() != null) {
+            jsonNode = valueProducer.produce(curValueDecl.getListParam());
+        } else if (curValueDecl.getMapParam() != null) {
+            jsonNode = valueProducer.produce(curValueDecl.getMapParam());
+        } else {
+            jsonNode = valueProducer.produce();
+        }
+        return jsonNode;
+    }
+
+    private void buildJsonWrapperNode(String typeName) {
         JsonWrapperNode jsonWrapperNode = new JsonWrapperNode();
         JsonNode type = typeMap.get(typeName);
         if (type != null) {
@@ -198,7 +200,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 typeMissNodes.add(jsonWrapperNode);
             }
         }
-
+        JsonBuilder builder = chooseBuilder();
         if (builder.inObject()) {
             builder.putWrapper(curValueDecl.getValueName(), jsonWrapperNode);
         } else {
@@ -206,23 +208,12 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         }
     }
 
-    private <T> Supplier<T> createSupplier(IValueProducer<T> valueProducer) {
-        Supplier<T> supplier  = () -> (T) valueProducer.produce();
-        if (curValueDecl.getSingleParam() != null) {
-            supplier = new SingleParamSupplier<>(valueProducer, curValueDecl.getSingleParam());
-        } else if (curValueDecl.getListParam() != null) {
-            supplier = new ListParamSupplier<>(valueProducer, new ArrayList<>(curValueDecl.getListParam()));
-        } else if (curValueDecl.getMapParam() != null) {
-            supplier = new MapParamSupplier<>(valueProducer, new HashMap<>(curValueDecl.getMapParam()));
-        }
-        return supplier;
-    }
-
-    private <T> void buildJsonValue(Supplier<T> supplier, BiConsumer<String, Supplier<T>> putInObject, Consumer<Supplier<T>> addInArray) {
-        if (chooseBuilder().inObject()) {
-            putInObject.accept(curValueDecl.getValueName(), supplier);
+    private void buildJsonValue(JsonNode jsonNode) {
+        JsonBuilder builder = chooseBuilder();
+        if (builder.inObject()) {
+            builder.putNode(curValueDecl.getValueName(), jsonNode);
         } else {
-            addInArray.accept(supplier);
+            builder.addNode(jsonNode);
         }
     }
 

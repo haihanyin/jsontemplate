@@ -10,6 +10,17 @@ public class JsonArrayNode implements JsonNode {
 
     private List<JsonNode> children = new LinkedList<>();
 
+    private Supplier<List<JsonNode>> supplier;
+
+    public JsonArrayNode(Supplier<List<JsonNode>> supplier) {
+        this.supplier = supplier;
+    }
+
+
+    public void add(JsonNode jsonNode) {
+        children.add(jsonNode);
+    }
+
     public void addInteger(Supplier<Integer> supplier) {
         children.add(new JsonIntegerNode(supplier));
     }

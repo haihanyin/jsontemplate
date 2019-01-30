@@ -37,6 +37,16 @@ public class JsonBuilder {
         return this;
     }
 
+    public JsonBuilder putNode(String key, JsonNode node) {
+        ((JsonObjectNode) nodeStack.peek()).putInteger(key, supplier);
+        return this;
+    }
+
+    public JsonBuilder addNode(JsonNode node) {
+        ((JsonArrayNode) nodeStack.peek()).putInteger(key, supplier);
+        return this;
+    }
+
     public JsonBuilder putInteger(String key, Supplier<Integer> supplier) {
         ((JsonObjectNode) nodeStack.peek()).putInteger(key, supplier);
         return this;
