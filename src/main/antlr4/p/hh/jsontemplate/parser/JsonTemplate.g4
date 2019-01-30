@@ -19,7 +19,8 @@ listParams : IDENTIFIER (',' IDENTIFIER)+;
 mapParams : mapParam (',' mapParam)*;
 mapParam : IDENTIFIER '=' IDENTIFIER;
 
-jsonArray : jsonValue? itemsArray ;
+jsonArray : arrayTypeInfo? itemsArray ;
+arrayTypeInfo : jsonValue;
 itemsArray : '[' items? ']' typeParamSpec?;
 items : item (',' item)*;
 item : jsonValue | variable | value;

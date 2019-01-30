@@ -12,13 +12,14 @@ public class JsonArrayNode implements JsonNode {
 
     private Supplier<List<JsonNode>> supplier;
 
-    public JsonArrayNode(Supplier<List<JsonNode>> supplier) {
-        this.supplier = supplier;
+    private JsonNode defaultNode;
+
+    public void addNode(JsonNode jsonNode) {
+        children.add(jsonNode);
     }
 
-
-    public void add(JsonNode jsonNode) {
-        children.add(jsonNode);
+    public void addDefaultNode(JsonNode jsonNode) {
+        this.defaultNode = defaultNode;
     }
 
     public void addInteger(Supplier<Integer> supplier) {

@@ -9,6 +9,10 @@ public class JsonObjectNode implements JsonNode {
 
     private Map<String, JsonNode> children = new LinkedHashMap<>();
 
+    public void putNode(String key, JsonNode node) {
+        children.put(key, node);
+    }
+
     public void putInteger(String key, Supplier<Integer> supplier) {
         children.put(key, new JsonIntegerNode(supplier));
     }

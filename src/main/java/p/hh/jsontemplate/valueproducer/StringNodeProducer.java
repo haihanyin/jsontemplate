@@ -1,7 +1,6 @@
 package p.hh.jsontemplate.valueproducer;
 
 import p.hh.jsontemplate.jsoncomposer.JsonStringNode;
-import p.hh.jsontemplate.supplier.SingleParamSupplier;
 
 import java.util.HashMap;
 import java.util.List;

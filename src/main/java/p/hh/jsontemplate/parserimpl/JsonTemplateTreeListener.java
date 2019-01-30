@@ -141,12 +141,24 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     @Override
     public void enterJsonArray(JsonTemplateParser.JsonArrayContext ctx) {
+        debug("enterJsonArray ", ctx);
         JsonBuilder builder = chooseBuilder();
         if (builder.isEmpty()) {
             builder.createArray();
         } else {
             builder.putArray(curValueDecl.getValueName());
         }
+    }
+
+    @Override
+    public void exitJsonArray(JsonTemplateParser.JsonArrayContext ctx) {
+        debug("exitJsonArray", ctx);
+        chooseBuilder().end();
+    }
+
+    @Override
+    public void enterArrayTypeInfo(JsonTemplateParser.ArrayTypeInfoContext ctx) {
+
     }
 
     @Override

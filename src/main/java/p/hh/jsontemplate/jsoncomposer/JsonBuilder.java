@@ -38,12 +38,12 @@ public class JsonBuilder {
     }
 
     public JsonBuilder putNode(String key, JsonNode node) {
-        ((JsonObjectNode) nodeStack.peek()).putInteger(key, supplier);
+        ((JsonObjectNode) nodeStack.peek()).putNode(key, node);
         return this;
     }
 
     public JsonBuilder addNode(JsonNode node) {
-        ((JsonArrayNode) nodeStack.peek()).putInteger(key, supplier);
+        ((JsonArrayNode) nodeStack.peek()).addNode(node);
         return this;
     }
 
