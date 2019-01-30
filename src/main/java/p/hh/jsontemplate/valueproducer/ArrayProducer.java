@@ -16,7 +16,7 @@ public class ArrayProducer implements IArrayProducer {
         if (sizeStr != null) {
             int size = Integer.parseInt(sizeStr);
         }
-        for
+        return null;
     }
 
     @Override

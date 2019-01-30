@@ -25,30 +25,16 @@ import java.util.stream.IntStream;
 public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
 
-    private Map<String, JsonNode> typeMap = new HashMap<>();
-    private Map<String, List<JsonWrapperNode>> typeMissMap = new HashMap<>();
-    private Map<String, IValueProducer> valueProducerMap = new HashMap<>();
-    private JsonBuilder jsonBuilder;
-    private JsonBuilder typeBuilder;
 
     private Stack<PropertyDeclaration> stack = new Stack<>();
 
     private boolean debug = true;
 
-    public JsonTemplateTreeListener() {
-        setupValueProducerMap();
-        jsonBuilder = new JsonBuilder();
+    public PropertyDeclaration getRoot() {
+        System.out.println("stack size " + stack.size());
+        return stack.peek();
     }
 
-    public String writeJson() {
-        return jsonBuilder.build().prettyPrint(0);
-    }
-
-    protected void setupValueProducerMap() {
-        valueProducerMap.put("s", new StringValueProducer());
-        valueProducerMap.put("i", new IntegerValueProducer());
-        valueProducerMap.put("b", new BooleanValueProducer());
-    }
 
     @Override
     public void enterPairProperty(JsonTemplateParser.PairPropertyContext ctx) {
@@ -115,6 +101,27 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
             stack.push(new PropertyDeclaration());
         }
         stack.peek().setAsArray(true);
+    }
+
+    @Override
+    public void enterItem(JsonTemplateParser.ItemContext ctx) {
+        stack.push(new PropertyDeclaration());
+    }
+
+    @Override
+    public void exitItem(JsonTemplateParser.ItemContext ctx) {
+        PropertyDeclaration pop = stack.pop();
+        stack.pop().addProperty(pop);
+    }
+
+    @Override
+    public void enterValue(JsonTemplateParser.ValueContext ctx) {
+        stack.peek().setSingleParam(ctx.getText());
+    }
+
+    @Override
+    public void enterVariableName(JsonTemplateParser.VariableNameContext ctx) {
+        stack.peek().setVariableName(ctx.getText());
     }
 
     private void debug(String message, ParserRuleContext ctx) {
