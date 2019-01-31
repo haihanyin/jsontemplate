@@ -1,5 +1,7 @@
 package p.hh.jsontemplate.valueproducer;
 
+import p.hh.jsontemplate.jsoncomposer.JsonNode;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
+public abstract class AbstractNodeProducer<T extends JsonNode> implements INodeProducer<T> {
 
     @Override
     public T produce() {
@@ -21,10 +23,7 @@ public abstract class AbstractValueProducer<T> implements IValueProducer<T> {
     }
 
     @Override
-    public T produce(List<String> valueList) {
-        int index = new Random().nextInt(valueList.size());
-        return this.produce(valueList.get(index));
-    }
+    public T produce(List<String> valueList) { throw new UnsupportedOperationException(); }
 
     @Override
     public T produce(Map<String, String> paramMap) {

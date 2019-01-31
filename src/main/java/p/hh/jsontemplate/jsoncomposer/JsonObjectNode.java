@@ -9,6 +9,7 @@ public class JsonObjectNode implements JsonNode {
 
     private Map<String, JsonNode> children = new LinkedHashMap<>();
 
+
     public void putInteger(String key, Supplier<Integer> supplier) {
         children.put(key, new JsonIntegerNode(supplier));
     }
@@ -59,5 +60,9 @@ public class JsonObjectNode implements JsonNode {
         return  "{\n" +
                 joinedIdentChildren +
                 "\n" + spaces + "}";
+    }
+
+    public void putNode(String key, JsonNode node) {
+        this.children.put(key, node);
     }
 }

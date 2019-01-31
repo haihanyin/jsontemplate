@@ -60,4 +60,7 @@ public class JsonArrayNode implements JsonNode {
                 "\n" + spaces + "]";
     }
 
+    public void addNode(JsonNode node) {
+        this.children.add(node);
+    }
 }
