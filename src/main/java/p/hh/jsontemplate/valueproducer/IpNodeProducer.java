@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class IpProducer extends AbstractNodeProducer<JsonStringNode> {
+public class IpNodeProducer extends AbstractNodeProducer<JsonStringNode> {
 
     @Override
     public JsonStringNode produce() {
@@ -15,7 +15,7 @@ public class IpProducer extends AbstractNodeProducer<JsonStringNode> {
 
     private String produceIp() {
         Random random = new Random();
-        int[] ipParts = new int[] {
+        int[] ipParts = new int[]{
                 random.nextInt(255),
                 random.nextInt(255),
                 random.nextInt(255),

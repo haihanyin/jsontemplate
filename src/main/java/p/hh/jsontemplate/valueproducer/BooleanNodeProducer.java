@@ -1,7 +1,6 @@
 package p.hh.jsontemplate.valueproducer;
 
 import p.hh.jsontemplate.jsoncomposer.JsonBooleanNode;
-import p.hh.jsontemplate.jsoncomposer.JsonIntegerNode;
 
 import java.util.List;
 import java.util.Random;

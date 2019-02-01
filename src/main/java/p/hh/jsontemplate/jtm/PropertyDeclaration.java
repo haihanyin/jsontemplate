@@ -26,6 +26,8 @@ public class PropertyDeclaration {
     protected boolean isArray;
 
     protected String arraySingleParam;
+    protected List<String> arrayListParam;
+    protected Map<String, String> arrayMapParam;
 
     public List<PropertyDeclaration> getProperties() {
         return properties;
@@ -49,9 +51,6 @@ public class PropertyDeclaration {
     public void setArrayListParam(List<String> arrayListParam) {
         this.arrayListParam = arrayListParam;
     }
-
-    protected List<String> arrayListParam;
-    protected Map<String, String> arrayMapParam;
 
     public String getVariableName() {
         return variableName;
@@ -168,7 +167,7 @@ public class PropertyDeclaration {
             String valueTypeName = findValueType();
             JsonNode jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
 
-            if(jsonNode == null) {
+            if (jsonNode == null) {
                 jsonNode = typeMap.get(valueTypeName);
                 if (jsonNode == null) {
                     jsonNode = new JsonWrapperNode();
@@ -193,7 +192,7 @@ public class PropertyDeclaration {
             String valueTypeName = findValueType();
             JsonNode jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
 
-            if(jsonNode == null) {
+            if (jsonNode == null) {
                 jsonNode = typeMap.get(valueTypeName);
                 if (jsonNode == null) {
                     throw new IllegalArgumentException("unknown valueTypeName");
@@ -213,6 +212,7 @@ public class PropertyDeclaration {
             builder.addNode(jsonNode);
         }
     }
+
     private String findValueType() {
         String valueTypeName = typeName;
         PropertyDeclaration declParent = this.getParent();

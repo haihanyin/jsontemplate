@@ -1,37 +1,25 @@
-package p.hh.jsontemplate.parserimpl;
+package p.hh.jsontemplate.jtm;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import p.hh.jsontemplate.jsoncomposer.JsonBuilder;
-import p.hh.jsontemplate.jsoncomposer.JsonNode;
-import p.hh.jsontemplate.jsoncomposer.JsonWrapperNode;
-import p.hh.jsontemplate.jtm.PropertyDeclaration;
 import p.hh.jsontemplate.parser.JsonTemplateBaseListener;
 import p.hh.jsontemplate.parser.JsonTemplateParser;
-import p.hh.jsontemplate.supplier.ListParamSupplier;
-import p.hh.jsontemplate.supplier.MapParamSupplier;
-import p.hh.jsontemplate.supplier.SingleParamSupplier;
-import p.hh.jsontemplate.valueproducer.IValueProducer;
 
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.Stack;
 import java.util.stream.IntStream;
 
 public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
 
-
     private Stack<PropertyDeclaration> stack = new Stack<>();
 
     private boolean debug = true;
+    private boolean inArrayParamSpec;
 
     public PropertyDeclaration getRoot() {
         System.out.println("stack size " + stack.size());
         return stack.peek();
     }
-
 
     @Override
     public void enterPairProperty(JsonTemplateParser.PairPropertyContext ctx) {
@@ -45,8 +33,6 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         PropertyDeclaration pop = stack.pop();
         stack.peek().addProperty(pop);
     }
-
-    private boolean inArrayParamSpec;
 
     @Override
     public void enterArrayParamSpec(JsonTemplateParser.ArrayParamSpecContext ctx) {
@@ -64,7 +50,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         String key = ctx.getChild(0).getText();
         String value = ctx.getChild(2).getText();
         PropertyDeclaration peek = stack.peek();
-        if(inArrayParamSpec) {
+        if (inArrayParamSpec) {
             peek.getArrayMapParam().put(key, value);
         } else {
             peek.getMapParam().put(key, value);
@@ -107,7 +93,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     @Override
     public void enterTypeName(JsonTemplateParser.TypeNameContext ctx) {
         debug("enterTypeName", ctx);
-        if ( !(ctx.getParent() instanceof JsonTemplateParser.TypeDefContext) ) {
+        if (!(ctx.getParent() instanceof JsonTemplateParser.TypeDefContext)) {
             stack.peek().setTypeName(ctx.getText());
         }
     }

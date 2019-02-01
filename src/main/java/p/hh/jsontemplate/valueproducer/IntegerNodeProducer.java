@@ -1,7 +1,6 @@
 package p.hh.jsontemplate.valueproducer;
 
 import p.hh.jsontemplate.jsoncomposer.JsonIntegerNode;
-import p.hh.jsontemplate.jsoncomposer.JsonStringNode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,7 @@ public class IntegerNodeProducer extends AbstractNodeProducer<JsonIntegerNode> {
         if (min != null && max != null && min < max) {
             return new JsonIntegerNode(() -> randomInRange(min, max));
         } else if (min != null && max == null) {
-            return new JsonIntegerNode(() -> randomInRange(min, 2*min));
+            return new JsonIntegerNode(() -> randomInRange(min, 2 * min));
         } else if (min == null && max != null) {
             return new JsonIntegerNode(() -> randomInRange(0, max));
         } else {

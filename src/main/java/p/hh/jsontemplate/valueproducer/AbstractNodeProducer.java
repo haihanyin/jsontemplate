@@ -23,7 +23,9 @@ public abstract class AbstractNodeProducer<T extends JsonNode> implements INodeP
     }
 
     @Override
-    public T produce(List<String> valueList) { throw new UnsupportedOperationException(); }
+    public T produce(List<String> valueList) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public T produce(Map<String, String> paramMap) {
@@ -63,10 +65,10 @@ public abstract class AbstractNodeProducer<T extends JsonNode> implements INodeP
     }
 
     protected Type getTypeArgument() {
-        return ((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        return ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
-    protected  <R> R pickParamValue(Map<String, String> paramMap, String paramName, Function<String, R> parser) {
+    protected <R> R pickParamValue(Map<String, String> paramMap, String paramName, Function<String, R> parser) {
         String paramValue = paramMap.remove(paramName);
         if (paramValue != null) {
             try {
@@ -79,7 +81,7 @@ public abstract class AbstractNodeProducer<T extends JsonNode> implements INodeP
         }
     }
 
-    protected  <R> R defaultIfNull(R object, R defaultValue) {
+    protected <R> R defaultIfNull(R object, R defaultValue) {
         return object != null ? object : defaultValue;
     }
 

@@ -54,10 +54,10 @@ public class JsonObjectNode implements JsonNode {
     public String prettyPrint(int identation) {
         String childSpaces = JsonUtils.makeIdentation(identation + 1);
         String joinedIdentChildren = children.entrySet().stream()
-                .map(entry -> childSpaces + "\"" + entry.getKey() + "\" : " + entry.getValue().prettyPrint(identation+1))
+                .map(entry -> childSpaces + "\"" + entry.getKey() + "\" : " + entry.getValue().prettyPrint(identation + 1))
                 .collect(Collectors.joining(",\n"));
         String spaces = JsonUtils.makeIdentation(identation);
-        return  "{\n" +
+        return "{\n" +
                 joinedIdentChildren +
                 "\n" + spaces + "}";
     }

@@ -18,7 +18,7 @@ public class StringNodeProducer extends AbstractNodeProducer<JsonStringNode> {
     }
 
     @Override
-    public JsonStringNode produce(String value)  {
+    public JsonStringNode produce(String value) {
         return new JsonStringNode(() -> value);
     }
 
@@ -42,7 +42,7 @@ public class StringNodeProducer extends AbstractNodeProducer<JsonStringNode> {
         } else if (min != null && max != null) {
             return new JsonStringNode(() -> produceString(randomInRange(min, max)));
         } else if (min != null) { // max == null
-            return new JsonStringNode(() -> produceString(randomInRange(min, 2*min)));
+            return new JsonStringNode(() -> produceString(randomInRange(min, 2 * min)));
         } else if (max != null) { // min == null
             return new JsonStringNode(() -> produceString(randomInRange(0, max)));
         } else { // no expected parameters
@@ -53,7 +53,7 @@ public class StringNodeProducer extends AbstractNodeProducer<JsonStringNode> {
     private String produceString(int length) {
         char[] chars = new char[length];
         Random random = new Random();
-        for (int i=0; i<length; i++) {
+        for (int i = 0; i < length; i++) {
             int index = random.nextInt(ALPHABETIC.length());
             chars[i] = ALPHABETIC.charAt(index);
         }
