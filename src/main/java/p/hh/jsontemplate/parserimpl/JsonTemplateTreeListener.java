@@ -137,7 +137,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     @Override
     public void exitItem(JsonTemplateParser.ItemContext ctx) {
         PropertyDeclaration pop = stack.pop();
-        stack.pop().addProperty(pop);
+        stack.peek().addProperty(pop);
     }
 
     @Override

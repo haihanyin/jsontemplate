@@ -1,5 +1,6 @@
 package p.hh.jsontemplate.jtm;
 
+import p.hh.jsontemplate.jsoncomposer.JsonArrayNode;
 import p.hh.jsontemplate.jsoncomposer.JsonBuilder;
 import p.hh.jsontemplate.jsoncomposer.JsonNode;
 import p.hh.jsontemplate.jsoncomposer.JsonWrapperNode;
@@ -219,7 +220,7 @@ public class PropertyDeclaration {
             declParent = declParent.getParent();
         }
         if (valueTypeName == null) {
-            throw new IllegalArgumentException("type name is null");
+            valueTypeName = "s"; // todo improve, temporary solution for array default type
         }
         return valueTypeName;
     }
@@ -265,7 +266,31 @@ public class PropertyDeclaration {
             }
         }
         buildChildrenJson(builder, producerMap, typeMap);
+        if (isArray) {
+            String valueTypeName = findValueType();
+            if (valueTypeName != null) {
+                JsonNode jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
+
+                if (jsonNode == null) {
+                    jsonNode = typeMap.get(valueTypeName);
+                }
+                setArrayInfo(builder.peekArrayNode(), jsonNode);
+            }
+        }
         builder.end();
+    }
+
+    private void setArrayInfo(JsonArrayNode jsonArrayNode, JsonNode defaultNode) {
+        jsonArrayNode.setDefaultNode(defaultNode);
+        if (this.arraySingleParam != null) {
+            jsonArrayNode.setParameters(this.arraySingleParam);
+        }
+        if (this.arrayListParam != null) {
+            jsonArrayNode.setParameters(this.arrayListParam);
+        }
+        if (this.arrayMapParam != null) {
+            jsonArrayNode.setParameters(this.arrayMapParam);
+        }
     }
 
     private void buildChildrenJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap) {
