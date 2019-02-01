@@ -11,10 +11,7 @@ import p.hh.jsontemplate.parser.JsonTemplateParser;
 import p.hh.jsontemplate.supplier.ListParamSupplier;
 import p.hh.jsontemplate.supplier.MapParamSupplier;
 import p.hh.jsontemplate.supplier.SingleParamSupplier;
-import p.hh.jsontemplate.valueproducer.BooleanValueProducer;
 import p.hh.jsontemplate.valueproducer.IValueProducer;
-import p.hh.jsontemplate.valueproducer.IntegerValueProducer;
-import p.hh.jsontemplate.valueproducer.StringValueProducer;
 
 import java.util.*;
 import java.util.function.BiConsumer;

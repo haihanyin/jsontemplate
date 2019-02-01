@@ -123,14 +123,14 @@ public class PropertyDeclaration {
         isObject = object;
     }
 
-    void visitTypeDeclaration(Map<String, PropertyDeclaration> typeMap) {
+    public void collectTypeDeclaration(List<PropertyDeclaration> typeList) {
         if (isTypeDeclaration()) {
-            typeMap.put(this.getTypeName().substring(1), this);
+            typeList.add(this);
             this.getParent().removeProperty(this);
             this.parent = null;
         }
         for (PropertyDeclaration declaration : properties) {
-            declaration.visitTypeDeclaration(typeMap);
+            declaration.collectTypeDeclaration(typeList);
         }
     }
 
@@ -247,6 +247,9 @@ public class PropertyDeclaration {
     }
 
     boolean isTypeDeclaration() {
-        return this.getTypeName().startsWith("%");
+        String valueName = this.getValueName();
+        if (valueName != null) {
+            return valueName.startsWith("%");
+        }
     }
 }
