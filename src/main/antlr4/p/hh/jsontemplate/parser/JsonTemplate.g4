@@ -1,9 +1,11 @@
 grammar JsonTemplate;
 
 root : jsonObject | jsonArray;
-jsonObject : '{' properties '}';
+jsonObject : objectTypeInfo? '{' properties '}';
+objectTypeInfo : jsonValue;
 properties : property (',' property)*;
-property : pairProperty;
+property : singleProperty | pairProperty;
+singleProperty : propertyNameSpec;
 pairProperty : propertyNameSpec ':' propertyValueSpec;
 propertyNameSpec : propertyName | typeDef ;
 propertyName : IDENTIFIER;

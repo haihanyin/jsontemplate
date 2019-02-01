@@ -188,6 +188,7 @@ public class PropertyDeclaration {
     }
 
     public void buildJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap) {
+        // TODO: build defaultTypeNode for every type
         if (!isObject && !isArray) { // plain value
             String valueTypeName = findValueType();
             JsonNode jsonNode = buildNodeFromProducer(producerMap, valueTypeName);

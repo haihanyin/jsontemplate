@@ -113,6 +113,19 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     @Override
+    public void enterSingleProperty(JsonTemplateParser.SinglePropertyContext ctx) {
+        debug("enterSingleProperty", ctx);
+        stack.push(new PropertyDeclaration());
+    }
+
+    @Override
+    public void exitSingleProperty(JsonTemplateParser.SinglePropertyContext ctx) {
+        debug("exitSingleProperty ", ctx);
+        PropertyDeclaration pop = stack.pop();
+        stack.peek().addProperty(pop);
+    }
+
+    @Override
     public void enterJsonObject(JsonTemplateParser.JsonObjectContext ctx) {
         debug("enterJsonObject", ctx);
         if (stack.isEmpty()) {

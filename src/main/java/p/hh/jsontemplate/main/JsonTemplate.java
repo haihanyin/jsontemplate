@@ -10,9 +10,12 @@ import p.hh.jsontemplate.jtm.PropertyDeclaration;
 import p.hh.jsontemplate.parser.JsonTemplateLexer;
 import p.hh.jsontemplate.parser.JsonTemplateParser;
 import p.hh.jsontemplate.parserimpl.JsonTemplateTreeListener;
+import p.hh.jsontemplate.valueproducer.Base64Producer;
 import p.hh.jsontemplate.valueproducer.BooleanNodeProducer;
 import p.hh.jsontemplate.valueproducer.INodeProducer;
 import p.hh.jsontemplate.valueproducer.IntegerNodeProducer;
+import p.hh.jsontemplate.valueproducer.IpProducer;
+import p.hh.jsontemplate.valueproducer.Ipv6Producer;
 import p.hh.jsontemplate.valueproducer.StringNodeProducer;
 
 import java.util.ArrayList;
@@ -45,6 +48,9 @@ public class JsonTemplate {
         producerMap.put("s", new StringNodeProducer());
         producerMap.put("i", new IntegerNodeProducer());
         producerMap.put("b", new BooleanNodeProducer());
+        producerMap.put("ip", new IpProducer());
+        producerMap.put("ipv6", new Ipv6Producer());
+        producerMap.put("base64", new Base64Producer());
 
         Map<String, JsonNode> typeMap = buildTypeMap(producerMap, typeDeclList);
         JsonBuilder builder = new JsonBuilder();
