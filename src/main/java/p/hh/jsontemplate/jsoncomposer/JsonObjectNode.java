@@ -52,11 +52,11 @@ public class JsonObjectNode implements JsonNode {
 
     @Override
     public String prettyPrint(int identation) {
-        String childSpaces = JsonUtils.makeIdentation(identation + 1);
+        String childSpaces = JsonNodeUtils.makeIdentation(identation + 1);
         String joinedIdentChildren = children.entrySet().stream()
                 .map(entry -> childSpaces + "\"" + entry.getKey() + "\" : " + entry.getValue().prettyPrint(identation + 1))
                 .collect(Collectors.joining(",\n"));
-        String spaces = JsonUtils.makeIdentation(identation);
+        String spaces = JsonNodeUtils.makeIdentation(identation);
         return "{\n" +
                 joinedIdentChildren +
                 "\n" + spaces + "}";

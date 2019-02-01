@@ -15,26 +15,9 @@ public class JsonArrayNode implements JsonNode {
 
     public static JsonArrayNode of(Collection<?> collection) {
         JsonArrayNode jsonArrayNode = new JsonArrayNode();
-        collection.forEach(obj -> {
-            JsonNode jsonNode;
-            if (obj == null) {
-                jsonNode = new JsonNullNode();
-            } else if (obj instanceof Integer) {
-                jsonNode = JsonIntegerNode.of((Integer) obj);
-            } else if (obj instanceof Boolean) {
-                jsonNode = JsonBooleanNode.of((Boolean) obj);
-            } else if (obj instanceof String) {
-                jsonNode = JsonStringNode.of((String) obj);
-            } else if (obj instanceof Collection) {
-                jsonNode = JsonArrayNode.of((Collection<?>) obj);
-            } else if (obj instanceof Map) {
-                jsonNode = JsonObjectNode.of((Map) obj);
-            } else {
-                jsonNode = JsonStringNode.of(((Object) obj).toString());
-            }
-            jsonArrayNode.addNode(jsonNode);
-        });
-
+        collection.stream()
+                .map(JsonNodeUtils::objectToNode)
+                .forEach(jsonArrayNode::addNode);
         return jsonArrayNode;
     }
 
@@ -140,7 +123,7 @@ public class JsonArrayNode implements JsonNode {
 
     @Override
     public String prettyPrint(int identation) {
-        String childrenSpaces = JsonUtils.makeIdentation(identation + 1);
+        String childrenSpaces = JsonNodeUtils.makeIdentation(identation + 1);
         ArrayList<JsonNode> printChildren = new ArrayList<>();
 
         printChildren.addAll(children);
@@ -151,7 +134,7 @@ public class JsonArrayNode implements JsonNode {
                 .map(child -> childrenSpaces + child.prettyPrint(identation + 1))
                 .collect(Collectors.joining(",\n"));
 
-        String spaces = JsonUtils.makeIdentation(identation);
+        String spaces = JsonNodeUtils.makeIdentation(identation);
         return "[\n" +
                 joinedIdentChildren +
                 "\n" + spaces + "]";
