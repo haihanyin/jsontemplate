@@ -3,6 +3,7 @@ package p.hh.jsontemplate.jsoncomposer;
 import p.hh.jsontemplate.valueproducer.INodeProducer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,32 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class JsonArrayNode implements JsonNode {
+
+    public static JsonArrayNode of(Collection<?> collection) {
+        JsonArrayNode jsonArrayNode = new JsonArrayNode();
+        collection.forEach(obj -> {
+            JsonNode jsonNode;
+            if (obj == null) {
+                jsonNode = new JsonNullNode();
+            } else if (obj instanceof Integer) {
+                jsonNode = JsonIntegerNode.of((Integer) obj);
+            } else if (obj instanceof Boolean) {
+                jsonNode = JsonBooleanNode.of((Boolean) obj);
+            } else if (obj instanceof String) {
+                jsonNode = JsonStringNode.of((String) obj);
+            } else if (obj instanceof Collection) {
+                jsonNode = JsonArrayNode.of((Collection<?>) obj);
+            } else if (obj instanceof Map) {
+                jsonNode = JsonObjectNode.of((Map) obj);
+            } else {
+                jsonNode = JsonStringNode.of(((Object) obj).toString());
+            }
+            jsonArrayNode.addNode(jsonNode);
+        });
+
+        return jsonArrayNode;
+    }
+
 
     private List<JsonNode> children = new LinkedList<>();
 

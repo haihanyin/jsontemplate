@@ -3,8 +3,11 @@ package p.hh.jsontemplate.main;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import p.hh.jsontemplate.jsoncomposer.JsonBooleanNode;
 import p.hh.jsontemplate.jsoncomposer.JsonBuilder;
+import p.hh.jsontemplate.jsoncomposer.JsonIntegerNode;
 import p.hh.jsontemplate.jsoncomposer.JsonNode;
+import p.hh.jsontemplate.jsoncomposer.JsonStringNode;
 import p.hh.jsontemplate.jsoncomposer.JsonWrapperNode;
 import p.hh.jsontemplate.jtm.JsonTemplateTreeListener;
 import p.hh.jsontemplate.jtm.PropertyDeclaration;
@@ -26,7 +29,7 @@ import java.util.Map;
 public class JsonTemplate {
 
     private String template;
-    private Map<String, Object> variableMap = new HashMap<>();
+    private Map<String, JsonNode> variableMap = new HashMap<>();
     private Map<String, INodeProducer> producerMap = new HashMap<>();
     private JsonNode builtJsonNode;
 
@@ -45,12 +48,12 @@ public class JsonTemplate {
     }
 
     public JsonTemplate withVariable(String variableName, Object variable) {
-        this.variableMap.put(variableName, variable);
+        this.putVariable(variableName, variable);
         return this;
     }
 
     public JsonTemplate withVariables(Map<String, Object> variables) {
-        this.variableMap.putAll(variables);
+        variables.forEach(this::putVariable);
         return this;
     }
 
@@ -126,5 +129,17 @@ public class JsonTemplate {
             }
         }
         return typeMap;
+    }
+
+    private void putVariable(String name, Object variable) {
+        JsonNode jsonNode = null;
+        if (variable instanceof Integer) {
+            jsonNode = new JsonIntegerNode(() -> (Integer) variable);
+        } else if (variable instanceof Boolean) {
+            jsonNode = new JsonBooleanNode(() -> (Boolean) variable);
+        } else if (variable instanceof String) {
+            jsonNode = new JsonStringNode(() -> (String) variable);
+        }
+
     }
 }
