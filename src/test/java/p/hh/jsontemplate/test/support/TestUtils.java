@@ -15,7 +15,7 @@ public class TestUtils {
     public static DocumentContext parse(String template) {
         System.out.println("===== Template =====");
         System.out.println(template);
-        JsonNode jsonNode = JsonTemplate.parse(template);
+        JsonNode jsonNode = new JsonTemplate().parse(template);
         String json = jsonNode.prettyPrint(0);
         System.out.println("===== Generated Json =====");
         System.out.println(json);
