@@ -18,7 +18,7 @@ public class JsonTemplateStringTest {
     @Test
     public void test_randomStringField() {
         DocumentContext document = parse("{aField : %s}");
-//        assertThat(document.read("$.aField", String.class).length(), is(STRING_LENGTH));
+        assertThat(document.read("$.aField", String.class).length(), is(STRING_LENGTH));
     }
 
     @Test

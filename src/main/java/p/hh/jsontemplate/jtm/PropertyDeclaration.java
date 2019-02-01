@@ -23,6 +23,33 @@ public class PropertyDeclaration {
     protected List<PropertyDeclaration> properties = new ArrayList<>();
     protected PropertyDeclaration parent;
     protected boolean isArray;
+
+    protected String arraySingleParam;
+
+    public List<PropertyDeclaration> getProperties() {
+        return properties;
+    }
+
+    public String getArraySingleParam() {
+        return arraySingleParam;
+    }
+
+    public void setArraySingleParam(String arraySingleParam) {
+        this.arraySingleParam = arraySingleParam;
+    }
+
+    public List<String> getArrayListParam() {
+        if (arrayListParam == null) {
+            arrayListParam = new ArrayList<>();
+        }
+        return arrayListParam;
+    }
+
+    public void setArrayListParam(List<String> arrayListParam) {
+        this.arrayListParam = arrayListParam;
+    }
+
+    protected List<String> arrayListParam;
     protected Map<String, String> arrayMapParam;
 
     public String getVariableName() {
@@ -108,6 +135,9 @@ public class PropertyDeclaration {
     }
 
     public Map<String, String> getArrayMapParam() {
+        if (arrayMapParam == null) {
+            arrayMapParam = new HashMap<>();
+        }
         return arrayMapParam;
     }
 
@@ -126,8 +156,6 @@ public class PropertyDeclaration {
     public void collectTypeDeclaration(List<PropertyDeclaration> typeList) {
         if (isTypeDeclaration()) {
             typeList.add(this);
-            this.getParent().removeProperty(this);
-            this.parent = null;
         }
         for (PropertyDeclaration declaration : properties) {
             declaration.collectTypeDeclaration(typeList);
@@ -247,9 +275,6 @@ public class PropertyDeclaration {
     }
 
     boolean isTypeDeclaration() {
-        String valueName = this.getValueName();
-        if (valueName != null) {
-            return valueName.startsWith("%");
-        }
+        return valueName != null && valueName.startsWith("%");
     }
 }

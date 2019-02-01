@@ -22,7 +22,8 @@ mapParam : IDENTIFIER '=' IDENTIFIER;
 
 jsonArray : arrayTypeInfo? itemsArray ;
 arrayTypeInfo : jsonValue;
-itemsArray : '[' items? ']' typeParamSpec?;
+itemsArray : '[' items? ']' arrayParamSpec?;
+arrayParamSpec : typeParamSpec;
 items : item (',' item)*;
 item : jsonValue | variable | value;
 value : IDENTIFIER;

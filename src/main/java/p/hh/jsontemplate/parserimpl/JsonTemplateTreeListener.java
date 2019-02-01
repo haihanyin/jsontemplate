@@ -46,12 +46,29 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
         stack.peek().addProperty(pop);
     }
 
+    private boolean inArrayParamSpec;
+
+    @Override
+    public void enterArrayParamSpec(JsonTemplateParser.ArrayParamSpecContext ctx) {
+        inArrayParamSpec = true;
+    }
+
+    @Override
+    public void exitArrayParamSpec(JsonTemplateParser.ArrayParamSpecContext ctx) {
+        inArrayParamSpec = false;
+    }
+
     @Override
     public void enterMapParam(JsonTemplateParser.MapParamContext ctx) {
         debug("enterMapParam", ctx);
         String key = ctx.getChild(0).getText();
         String value = ctx.getChild(2).getText();
-        stack.peek().getMapParam().put(key, value);
+        PropertyDeclaration peek = stack.peek();
+        if(inArrayParamSpec) {
+            peek.getArrayMapParam().put(key, value);
+        } else {
+            peek.getMapParam().put(key, value);
+        }
     }
 
     @Override
@@ -61,13 +78,25 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
                 .mapToObj(ctx::getChild)
                 .map(ParseTree::getText)
                 .filter(text -> !",".equals(text))
-                .forEach(param -> stack.peek().getListParam().add(param));
+                .forEach(param -> {
+                    PropertyDeclaration peek = stack.peek();
+                    if (inArrayParamSpec) {
+                        peek.getArrayListParam().add(param);
+                    } else {
+                        peek.getListParam().add(param);
+                    }
+                });
     }
 
     @Override
     public void enterSingleParam(JsonTemplateParser.SingleParamContext ctx) {
         debug("enterSingleParam", ctx);
-        stack.peek().setSingleParam(ctx.getText());
+        PropertyDeclaration peek = stack.peek();
+        if (inArrayParamSpec) {
+            peek.setArraySingleParam(ctx.getText());
+        } else {
+            peek.setSingleParam(ctx.getText());
+        }
     }
 
     @Override

@@ -37,6 +37,10 @@ public class JsonTemplate {
         List<PropertyDeclaration> typeDeclList = new ArrayList<>();
         rootDeclaration.collectTypeDeclaration(typeDeclList);
 
+        for (PropertyDeclaration typeDecl : typeDeclList) {
+            typeDecl.getParent().removeProperty(typeDecl);
+            typeDecl.setParent(null);
+        }
         Map<String, INodeProducer> producerMap = new HashMap<>();
         producerMap.put("s", new StringNodeProducer());
         producerMap.put("i", new IntegerNodeProducer());
@@ -56,7 +60,7 @@ public class JsonTemplate {
             JsonBuilder jsonBuilder = new JsonBuilder();
             typeDecl.buildType(jsonBuilder, producerMap, typeMap, missTypeMap);
             JsonNode typeNode = jsonBuilder.build();
-            typeMap.put(typeDecl.getTypeName().substring(1), typeNode);
+            typeMap.put(typeDecl.getValueName().substring(1), typeNode);
         }
         for (Map.Entry<String, List<JsonWrapperNode>> entry : missTypeMap.entrySet()) {
             JsonNode jsonNode = typeMap.get(entry.getKey());
