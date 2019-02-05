@@ -79,6 +79,7 @@ public class JsonTemplate {
 
         PropertyDeclaration rootDeclaration = stringToJsonTemplateModel(template);
         Map<String, JsonNode> typeMap = buildTypeMap(rootDeclaration);
+        rootDeclaration.applyVariables(variableMap);
 
         JsonBuilder builder = new JsonBuilder();
         rootDeclaration.buildJson(builder, producerMap, typeMap, Collections.emptyMap(), variableNodeMap);

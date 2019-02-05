@@ -9,6 +9,7 @@ import p.hh.jsontemplate.valueproducer.INodeProducer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -294,6 +295,30 @@ public class PropertyDeclaration {
             return variableMap.get(name.substring(1));
         }
         return null;
+    }
+
+
+    public void applyVariables(Map<String, Object> variableMap) {
+        if (singleParam != null) {
+            if (singleParam.startsWith("$")) {
+                Object variable = variableMap.get(singleParam.substring(1));
+                if (variable instanceof Collection<?>) {
+                    singleParam = null;
+                } else if (variable.getClass().isArray()) {
+                    singleParam = null;
+                } else if (variable instanceof Map) {
+                    singleParam = null;
+                    listParam = null;
+                }
+            }
+        } else if (listParam != null) {
+            listParam
+        }
+
+        mapParam;
+        arraySingleParam;
+        arrayListParam;
+        arrayMapParam;
     }
 
 
