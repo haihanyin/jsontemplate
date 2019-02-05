@@ -13,13 +13,7 @@ import p.hh.jsontemplate.jtm.JsonTemplateTreeListener;
 import p.hh.jsontemplate.jtm.PropertyDeclaration;
 import p.hh.jsontemplate.parser.JsonTemplateLexer;
 import p.hh.jsontemplate.parser.JsonTemplateParser;
-import p.hh.jsontemplate.valueproducer.Base64NodeProducer;
-import p.hh.jsontemplate.valueproducer.BooleanNodeProducer;
-import p.hh.jsontemplate.valueproducer.INodeProducer;
-import p.hh.jsontemplate.valueproducer.IntegerNodeProducer;
-import p.hh.jsontemplate.valueproducer.IpNodeProducer;
-import p.hh.jsontemplate.valueproducer.Ipv6NodeProducer;
-import p.hh.jsontemplate.valueproducer.StringNodeProducer;
+import p.hh.jsontemplate.valueproducer.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +34,7 @@ public class JsonTemplate {
         producerMap.put("ip", new IpNodeProducer());
         producerMap.put("ipv6", new Ipv6NodeProducer());
         producerMap.put("base64", new Base64NodeProducer());
+        producerMap.put("raw", new RawJsonNodeProducer());
     }
 
     public JsonTemplate withTempalte(String template) {

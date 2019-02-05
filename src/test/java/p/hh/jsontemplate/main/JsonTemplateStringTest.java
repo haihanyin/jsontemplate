@@ -48,7 +48,7 @@ public class JsonTemplateStringTest {
 
     @Test
     public void test_minMaxParamStringField() {
-        DocumentContext document = parse("{aField : %s(min=10, max=20)}");
+        DocumentContext document = parse("{aField : %s(min=$10, max=20)}");
         assertThat(document.read("$.aField", String.class).length(), allOf(
                 greaterThanOrEqualTo(10), lessThanOrEqualTo(20)));
     }

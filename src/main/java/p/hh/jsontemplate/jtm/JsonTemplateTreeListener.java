@@ -140,7 +140,7 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     @Override
-    public void enterValue(JsonTemplateParser.ValueContext ctx) {
+    public void enterVariableWrapper(JsonTemplateParser.VariableWrapperContext ctx) {
         stack.peek().setSingleParam(ctx.getText());
     }
 

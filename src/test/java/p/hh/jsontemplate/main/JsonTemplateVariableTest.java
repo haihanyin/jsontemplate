@@ -64,4 +64,14 @@ public class JsonTemplateVariableTest {
 
         parse("{person : $person}", varMap);
     }
+
+    @Test
+    public void test_temp() {
+        Map<String, Object> varMap = new HashMap<>();
+        String json = "{\n" +
+                "  \"string\": \"Hello World\"\n" +
+                "}";
+        varMap.put("json", json);
+        parse("{json : %raw($json)}", varMap);
+    }
 }

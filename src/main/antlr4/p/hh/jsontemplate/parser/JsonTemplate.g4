@@ -12,23 +12,23 @@ propertyName : IDENTIFIER;
 typeDef : '%'typeName;
 typeName : IDENTIFIER;
 
-propertyValueSpec : jsonValue | jsonArray | jsonObject | variable;
+propertyValueSpec : jsonValue | jsonArray | jsonObject | variableWrapper;
 jsonValue : typeInfo typeParamSpec?;
 typeInfo : '%'typeName;
 
 typeParamSpec : '(' singleParam ')' | '(' listParams ')' | '(' mapParams ')';
-singleParam : IDENTIFIER;
-listParams : IDENTIFIER (',' IDENTIFIER)+;
+variableWrapper : IDENTIFIER | variable;
+singleParam : variableWrapper;
+listParams : variableWrapper (',' variableWrapper )+;
 mapParams : mapParam (',' mapParam)*;
-mapParam : IDENTIFIER '=' IDENTIFIER;
+mapParam : IDENTIFIER '=' variableWrapper;
 
 jsonArray : arrayTypeInfo? itemsArray ;
 arrayTypeInfo : jsonValue;
 itemsArray : '[' items? ']' arrayParamSpec?;
 arrayParamSpec : typeParamSpec;
 items : item (',' item)*;
-item : jsonValue | variable | value;
-value : IDENTIFIER;
+item : jsonValue | variableWrapper;
 
 variable : '$'variableName;
 variableName : IDENTIFIER;
