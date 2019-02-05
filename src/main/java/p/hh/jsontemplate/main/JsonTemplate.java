@@ -48,12 +48,12 @@ public class JsonTemplate {
     }
 
     public JsonTemplate withVariable(String variableName, Object variable) {
-        this.putVariable(variableName, variable);
+        this.variableMap.put(variableName, JsonNode.of(variable));
         return this;
     }
 
     public JsonTemplate withVariables(Map<String, Object> variables) {
-        variables.forEach(this::putVariable);
+        variables.forEach(this::withVariable);
         return this;
     }
 
@@ -82,7 +82,7 @@ public class JsonTemplate {
         Map<String, JsonNode> typeMap = buildTypeMap(rootDeclaration);
 
         JsonBuilder builder = new JsonBuilder();
-        rootDeclaration.buildJson(builder, producerMap, typeMap);
+        rootDeclaration.buildJson(builder, producerMap, typeMap, variableMap);
 
         return builder.build();
     }
@@ -113,12 +113,12 @@ public class JsonTemplate {
         return typeMap;
     }
 
-    private static Map<String, JsonNode> buildTypeMap(Map<String, INodeProducer> producerMap, List<PropertyDeclaration> typeDeclarations) {
+    private Map<String, JsonNode> buildTypeMap(Map<String, INodeProducer> producerMap, List<PropertyDeclaration> typeDeclarations) {
         Map<String, JsonNode> typeMap = new HashMap<>();
         Map<String, List<JsonWrapperNode>> missTypeMap = new HashMap<>();
         for (PropertyDeclaration typeDecl : typeDeclarations) {
             JsonBuilder jsonBuilder = new JsonBuilder();
-            typeDecl.buildType(jsonBuilder, producerMap, typeMap, missTypeMap);
+            typeDecl.buildType(jsonBuilder, producerMap, typeMap, missTypeMap, variableMap);
             JsonNode typeNode = jsonBuilder.build();
             typeMap.put(typeDecl.getValueName().substring(1), typeNode);
         }
@@ -131,15 +131,4 @@ public class JsonTemplate {
         return typeMap;
     }
 
-    private void putVariable(String name, Object variable) {
-        JsonNode jsonNode = null;
-        if (variable instanceof Integer) {
-            jsonNode = new JsonIntegerNode(() -> (Integer) variable);
-        } else if (variable instanceof Boolean) {
-            jsonNode = new JsonBooleanNode(() -> (Boolean) variable);
-        } else if (variable instanceof String) {
-            jsonNode = new JsonStringNode(() -> (String) variable);
-        }
-
-    }
 }

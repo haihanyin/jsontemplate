@@ -162,46 +162,55 @@ public class PropertyDeclaration {
         }
     }
 
-    public void buildType(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap) {
+    public void buildType(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, JsonNode> variableMap) {
         if (!isObject && !isArray) { // plain value
-            String valueTypeName = findValueType();
-            JsonNode jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
+            JsonNode jsonNode = null;
+            if (variableName != null) {
+                jsonNode = variableMap.get(variableName);
+            } else {
+                String valueTypeName = findValueType();
+                jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
 
-            if (jsonNode == null) {
-                jsonNode = typeMap.get(valueTypeName);
                 if (jsonNode == null) {
-                    jsonNode = new JsonWrapperNode();
-                    List<JsonWrapperNode> jsonWrapperNodes = missTypeMap.get(valueTypeName);
-                    if (jsonWrapperNodes == null) {
-                        missTypeMap.put(valueTypeName, Arrays.asList((JsonWrapperNode) jsonNode));
-                    } else {
-                        jsonWrapperNodes.add((JsonWrapperNode) jsonNode);
+                    jsonNode = typeMap.get(valueTypeName);
+                    if (jsonNode == null) {
+                        jsonNode = new JsonWrapperNode();
+                        List<JsonWrapperNode> jsonWrapperNodes = missTypeMap.get(valueTypeName);
+                        if (jsonWrapperNodes == null) {
+                            missTypeMap.put(valueTypeName, Arrays.asList((JsonWrapperNode) jsonNode));
+                        } else {
+                            jsonWrapperNodes.add((JsonWrapperNode) jsonNode);
+                        }
                     }
                 }
             }
 
             putOrAddNode(builder, jsonNode);
         } else {
-            handleComposite(builder, producerMap, typeMap);
+            handleComposite(builder, producerMap, typeMap, variableMap);
         }
     }
 
-    public void buildJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap) {
+    public void buildJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, JsonNode> variableMap) {
         // TODO: build defaultTypeNode for every type
         if (!isObject && !isArray) { // plain value
-            String valueTypeName = findValueType();
-            JsonNode jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
+            JsonNode jsonNode = null;
+            if (variableName != null) {
+                jsonNode = variableMap.get(variableName);
+            } else {
+                String valueTypeName = findValueType();
+                jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
 
-            if (jsonNode == null) {
-                jsonNode = typeMap.get(valueTypeName);
                 if (jsonNode == null) {
-                    throw new IllegalArgumentException("unknown valueTypeName");
+                    jsonNode = typeMap.get(valueTypeName);
                 }
             }
-
+            if (jsonNode == null) {
+                throw new IllegalArgumentException("unknown valueTypeName");
+            }
             putOrAddNode(builder, jsonNode);
         } else {
-            handleComposite(builder, producerMap, typeMap);
+            handleComposite(builder, producerMap, typeMap, variableMap);
         }
     }
 
@@ -243,7 +252,7 @@ public class PropertyDeclaration {
         return jsonNode;
     }
 
-    private void handleComposite(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap) {
+    private void handleComposite(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, JsonNode> variableMap) {
         if (parent == null) {
             if (isObject) {
                 builder.createObject();
@@ -266,7 +275,7 @@ public class PropertyDeclaration {
                 }
             }
         }
-        buildChildrenJson(builder, producerMap, typeMap);
+        buildChildrenJson(builder, producerMap, typeMap, variableMap);
         if (isArray) {
             String valueTypeName = findValueType();
             if (valueTypeName != null) {
@@ -294,9 +303,9 @@ public class PropertyDeclaration {
         }
     }
 
-    private void buildChildrenJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap) {
+    private void buildChildrenJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, JsonNode> variableMap) {
         for (PropertyDeclaration declaration : properties) {
-            declaration.buildJson(builder, producerMap, typeMap);
+            declaration.buildJson(builder, producerMap, typeMap, variableMap);
         }
     }
 

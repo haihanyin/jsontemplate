@@ -2,13 +2,7 @@ package p.hh.jsontemplate.jsoncomposer;
 
 import p.hh.jsontemplate.valueproducer.INodeProducer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JsonArrayNode implements JsonNode {
@@ -16,7 +10,15 @@ public class JsonArrayNode implements JsonNode {
     public static JsonArrayNode of(Collection<?> collection) {
         JsonArrayNode jsonArrayNode = new JsonArrayNode();
         collection.stream()
-                .map(JsonNodeUtils::objectToNode)
+                .map(JsonNode::of)
+                .forEach(jsonArrayNode::addNode);
+        return jsonArrayNode;
+    }
+
+    public static JsonArrayNode of(Object[] objects) {
+        JsonArrayNode jsonArrayNode = new JsonArrayNode();
+        Arrays.stream(objects)
+                .map(JsonNode::of)
                 .forEach(jsonArrayNode::addNode);
         return jsonArrayNode;
     }

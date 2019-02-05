@@ -7,6 +7,12 @@ import java.util.stream.Collectors;
 
 public class JsonObjectNode implements JsonNode {
 
+    public static JsonObjectNode of(Map<String, ?> valueMap) {
+        JsonObjectNode jsonObjectNode = new JsonObjectNode();
+        valueMap.forEach((key, value) -> jsonObjectNode.putNode(key, JsonNode.of(value)));
+        return jsonObjectNode;
+    }
+
     private Map<String, JsonNode> children = new LinkedHashMap<>();
 
 
