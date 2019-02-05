@@ -12,7 +12,8 @@ propertyName : IDENTIFIER;
 typeDef : '%'typeName;
 typeName : IDENTIFIER;
 
-propertyValueSpec : jsonValue | jsonArray | jsonObject | variableWrapper;
+propertyValueSpec : jsonValue | jsonArray | jsonObject | propertyVariableWrapper;
+propertyVariableWrapper : variableWrapper;
 jsonValue : typeInfo typeParamSpec?;
 typeInfo : '%'typeName;
 
@@ -28,7 +29,8 @@ arrayTypeInfo : jsonValue;
 itemsArray : '[' items? ']' arrayParamSpec?;
 arrayParamSpec : typeParamSpec;
 items : item (',' item)*;
-item : jsonValue | variableWrapper;
+item : jsonValue | itemVariableWrapper;
+itemVariableWrapper : variableWrapper;
 
 variable : '$'variableName;
 variableName : IDENTIFIER;

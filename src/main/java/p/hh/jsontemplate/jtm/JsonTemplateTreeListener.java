@@ -13,11 +13,11 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
 
     private Stack<PropertyDeclaration> stack = new Stack<>();
 
-    private boolean debug = true;
+    private boolean debug = false;
     private boolean inArrayParamSpec;
 
     public PropertyDeclaration getRoot() {
-        System.out.println("stack size " + stack.size());
+        //System.out.println("stack size " + stack.size());
         return stack.peek();
     }
 
@@ -91,6 +91,11 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     @Override
+    public void enterPropertyVariableWrapper(JsonTemplateParser.PropertyVariableWrapperContext ctx) {
+        stack.peek().setTypeName(ctx.getText());
+    }
+
+    @Override
     public void enterTypeName(JsonTemplateParser.TypeNameContext ctx) {
         debug("enterTypeName", ctx);
         if (!(ctx.getParent() instanceof JsonTemplateParser.TypeDefContext)) {
@@ -140,13 +145,8 @@ public class JsonTemplateTreeListener extends JsonTemplateBaseListener {
     }
 
     @Override
-    public void enterVariableWrapper(JsonTemplateParser.VariableWrapperContext ctx) {
+    public void enterItemVariableWrapper(JsonTemplateParser.ItemVariableWrapperContext ctx) {
         stack.peek().setSingleParam(ctx.getText());
-    }
-
-    @Override
-    public void enterVariableName(JsonTemplateParser.VariableNameContext ctx) {
-        stack.peek().setVariableName(ctx.getText());
     }
 
     private void debug(String message, ParserRuleContext ctx) {

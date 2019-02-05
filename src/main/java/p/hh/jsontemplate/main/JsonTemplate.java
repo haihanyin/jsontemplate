@@ -16,6 +16,7 @@ import p.hh.jsontemplate.parser.JsonTemplateParser;
 import p.hh.jsontemplate.valueproducer.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class JsonTemplate {
 
     private String template;
-    private Map<String, JsonNode> variableMap = new HashMap<>();
+    private Map<String, Object> variableMap = new HashMap<>();
     private Map<String, INodeProducer> producerMap = new HashMap<>();
     private JsonNode builtJsonNode;
 
@@ -43,7 +44,7 @@ public class JsonTemplate {
     }
 
     public JsonTemplate withVariable(String variableName, Object variable) {
-        this.variableMap.put(variableName, JsonNode.of(variable));
+        this.variableMap.put(variableName, variable);
         return this;
     }
 
@@ -77,7 +78,7 @@ public class JsonTemplate {
         Map<String, JsonNode> typeMap = buildTypeMap(rootDeclaration);
 
         JsonBuilder builder = new JsonBuilder();
-        rootDeclaration.buildJson(builder, producerMap, typeMap, variableMap);
+        rootDeclaration.buildJson(builder, producerMap, typeMap, Collections.emptyMap(), variableMap);
 
         return builder.build();
     }

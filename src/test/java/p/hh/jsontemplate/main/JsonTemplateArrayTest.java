@@ -96,4 +96,9 @@ public class JsonTemplateArrayTest {
         assertThat(document.read("$.anArray[2]", Boolean.class), is(false));
         assertThat(document.read("$.anArray[3]", String.class), is("4"));
     }
+
+    @Test
+    public void test() {
+        parse("{%address : {city: %s(Utrecht), number: %i}, info: {home: %address, office: %address})}");
+    }
 }
