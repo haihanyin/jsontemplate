@@ -25,6 +25,7 @@ public class JsonTemplate {
 
     private String template;
     private Map<String, Object> variableMap = new HashMap<>();
+    private Map<String, JsonNode> variableNodeMap = new HashMap<>();
     private Map<String, INodeProducer> producerMap = new HashMap<>();
     private JsonNode builtJsonNode;
 
@@ -74,13 +75,19 @@ public class JsonTemplate {
     }
 
     private JsonNode buildJsonNode(String template) {
+        buildVariableNodeMap();
+
         PropertyDeclaration rootDeclaration = stringToJsonTemplateModel(template);
         Map<String, JsonNode> typeMap = buildTypeMap(rootDeclaration);
 
         JsonBuilder builder = new JsonBuilder();
-        rootDeclaration.buildJson(builder, producerMap, typeMap, Collections.emptyMap(), variableMap);
+        rootDeclaration.buildJson(builder, producerMap, typeMap, Collections.emptyMap(), variableNodeMap);
 
         return builder.build();
+    }
+
+    private void buildVariableNodeMap() {
+        variableMap.forEach((key, value) -> this.variableNodeMap.put(key, JsonNode.of(value)));
     }
 
     private PropertyDeclaration stringToJsonTemplateModel(String template) {
@@ -114,7 +121,7 @@ public class JsonTemplate {
         Map<String, List<JsonWrapperNode>> missTypeMap = new HashMap<>();
         for (PropertyDeclaration typeDecl : typeDeclarations) {
             JsonBuilder jsonBuilder = new JsonBuilder();
-            typeDecl.buildType(jsonBuilder, producerMap, typeMap, missTypeMap, variableMap);
+            typeDecl.buildType(jsonBuilder, producerMap, typeMap, missTypeMap, variableNodeMap);
             JsonNode typeNode = jsonBuilder.build();
             typeMap.put(typeDecl.getValueName().substring(1), typeNode);
         }

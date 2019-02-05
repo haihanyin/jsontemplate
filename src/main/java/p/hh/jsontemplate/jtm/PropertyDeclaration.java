@@ -156,7 +156,7 @@ public class PropertyDeclaration {
         }
     }
 
-    private void buildJsonTemplate(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, Object> variableMap) {
+    private void buildJsonTemplate(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, JsonNode> variableMap) {
         if (!isObject && !isArray) { // plain value
             handlePlainValue(builder, producerMap, typeMap, variableMap, new DefaultHandlerForBuildType(missTypeMap));
         } else {
@@ -164,12 +164,9 @@ public class PropertyDeclaration {
         }
     }
 
-    private void handlePlainValue(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, Object> variableMap, DefaultHandler defaultHandler) {
-        JsonNode jsonNode = null;
-        Object variable = findVariable(variableMap, typeName);
-        if (variable != null) {
-            jsonNode = JsonNode.of(variable);
-        } else {
+    private void handlePlainValue(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, JsonNode> variableMap, DefaultHandler defaultHandler) {
+        JsonNode jsonNode = findJsonNodeFromVariable(variableMap, typeName);
+        if (jsonNode == null) {
             String valueTypeName = findValueType();
             jsonNode = buildNodeFromProducer(producerMap, valueTypeName);
 
@@ -184,11 +181,11 @@ public class PropertyDeclaration {
         putOrAddNode(builder, jsonNode);
     }
 
-    public void buildType(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, Object> variableMap) {
+    public void buildType(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, JsonNode> variableMap) {
         buildJsonTemplate(builder, producerMap, typeMap, missTypeMap, variableMap);
     }
 
-    public void buildJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, Object> variableMap) {
+    public void buildJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, JsonNode> variableMap) {
         // TODO: build defaultTypeNode for every type
         buildJsonTemplate(builder, producerMap, typeMap, missTypeMap, variableMap);
     }
@@ -231,7 +228,7 @@ public class PropertyDeclaration {
         return jsonNode;
     }
 
-    private void handleComposite(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, Object> variableMap) {
+    private void handleComposite(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, JsonNode> variableMap) {
         if (parent == null) {
             if (isObject) {
                 builder.createObject();
@@ -282,7 +279,7 @@ public class PropertyDeclaration {
         }
     }
 
-    private void buildChildrenJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, Object> variableMap) {
+    private void buildChildrenJson(JsonBuilder builder, Map<String, INodeProducer> producerMap, Map<String, JsonNode> typeMap, Map<String, List<JsonWrapperNode>> missTypeMap, Map<String, JsonNode> variableMap) {
         for (PropertyDeclaration declaration : properties) {
             declaration.buildJson(builder, producerMap, typeMap, missTypeMap, variableMap);
         }
@@ -292,7 +289,7 @@ public class PropertyDeclaration {
         return valueName != null && valueName.startsWith("%");
     }
 
-    private Object findVariable(Map<String, Object> variableMap, String name) {
+    private JsonNode findJsonNodeFromVariable(Map<String, JsonNode> variableMap, String name) {
         if (name != null && name.startsWith("$")) {
             return variableMap.get(name.substring(1));
         }
