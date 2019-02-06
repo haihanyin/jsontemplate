@@ -1,9 +1,10 @@
 # jsontemplate
-<table><tr>
-<th width="30%">Template</th>
-<th width="30%">Generated Json</th>
-<th width="70%">Description</th></tr>
-
+<table>
+<tr>
+<th>Template</th>
+<th>Generated Json</th>
+<th>Description&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+</tr>
 
 <tr><td><pre>
 {
