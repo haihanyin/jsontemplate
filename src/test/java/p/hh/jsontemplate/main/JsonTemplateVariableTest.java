@@ -7,6 +7,7 @@ import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -82,12 +83,48 @@ public class JsonTemplateVariableTest {
     }
 
     @Test
-    public void test_temp() {
-        Map<String, Object> varMap = new HashMap<>();
-        String json = "{\n" +
-                "  \"string\": \"Hello World\"\n" +
-                "}";
-        varMap.put("json", json);
-        parse("{json : %raw($json)}", varMap);
+    public void test_objectInSingleParam() {
+        Map<String, Object> variables = new HashMap<>();
+        String value = "helloworld";
+        variables.put("myValue", value);
+        DocumentContext document = parse("{aField: @s($myValue)}", variables);
+        assertThat(document.read("$.aField", String.class), is(value));
+    }
+
+    @Test
+    public void test_listInSingleParam() {
+        Map<String, Object> variables = new HashMap<>();
+        List<String> value = Arrays.asList("A", "B", "C", "D");
+        variables.put("myValue", value);
+        DocumentContext document = parse("{aField: @s($myValue)}", variables);
+        assertThat(document.read("$.aField", String.class), isIn(value));
+    }
+
+    @Test
+    public void test_mapInSingleParam() {
+        Map<String, Object> variables = new HashMap<>();
+        Map<String, String> value = new HashMap<>();
+        value.put("size", "20");
+        variables.put("config", value);
+        DocumentContext document = parse("{aField: @s($config)}", variables);
+        assertThat(document.read("$.aField", String.class).length(), is(20));
+    }
+
+    @Test
+    public void test_objectInListParam() {
+        Map<String, Object> variables = new HashMap<>();
+        String value = "hello";
+        variables.put("myValue", value);
+        DocumentContext document = parse("{aField: @s(A, B, $myValue, D)}", variables);
+        assertThat(document.read("$.aField", String.class), isIn(Arrays.asList("A", "B", "hello", "D")));
+    }
+
+    @Test
+    public void test_objectInMapParam() {
+        Map<String, Object> variables = new HashMap<>();
+        int size = 20;
+        variables.put("size", 20);
+        DocumentContext document = parse("{aField: @s(size=$size)}", variables);
+        assertThat(document.read("$.aField", String.class).length(), is(20));
     }
 }

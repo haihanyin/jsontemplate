@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class PropertyDeclaration {
     protected String valueName;
@@ -287,7 +288,7 @@ public class PropertyDeclaration {
     }
 
     boolean isTypeDeclaration() {
-        return valueName != null && valueName.startsWith("%");
+        return valueName != null && valueName.startsWith("@");
     }
 
     private JsonNode findJsonNodeFromVariable(Map<String, JsonNode> variableMap, String name) {
@@ -299,26 +300,55 @@ public class PropertyDeclaration {
 
 
     public void applyVariables(Map<String, Object> variableMap) {
-        if (singleParam != null) {
-            if (singleParam.startsWith("$")) {
-                Object variable = variableMap.get(singleParam.substring(1));
-                if (variable instanceof Collection<?>) {
-                    singleParam = null;
-                } else if (variable.getClass().isArray()) {
-                    singleParam = null;
-                } else if (variable instanceof Map) {
-                    singleParam = null;
-                    listParam = null;
+        if (isArray || isObject){
+            this.properties.forEach(p -> p.applyVariables(variableMap));
+        } else {
+            if (singleParam != null) {
+                if (singleParam.startsWith("$")) {
+                    Object variable = variableMap.get(singleParam.substring(1));
+                    if (variable instanceof Collection<?>) {
+                        Collection<?> collectionVariable = (Collection<?>) variable;
+                        singleParam = null;
+                        listParam = collectionVariable.stream()
+                                .map(Object::toString)
+                                .collect(Collectors.toList());
+                        // todo primitives
+                    } else if (variable.getClass().isArray()) {
+                        Object[] arrayVariable = (Object[]) variable;
+                        singleParam = null;
+                        listParam = Arrays.stream(arrayVariable)
+                                .map(Object::toString)
+                                .collect(Collectors.toList());
+                        // todo primitives
+                    } else if (variable instanceof Map) {
+                        singleParam = null;
+                        listParam = null;
+                        Map<String, Object> mapVariable = (Map<String, Object>) variable;
+                        mapParam = mapVariable.entrySet().stream()
+                                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString()));
+
+                    } else {
+                        singleParam = variable.toString();
+                    }
+                }
+            } else if (listParam != null) {
+                for (int i = 0; i < listParam.size(); i++) {
+                    if (listParam.get(i).startsWith("$")) {
+                        Object variable = variableMap.get(listParam.get(i).substring(1));
+                        listParam.set(i, variable.toString());
+                    }
+                }
+            } else if (mapParam != null) {
+                for (Map.Entry<String, String> entry : mapParam.entrySet()) {
+                    if (entry.getValue().startsWith("$")) {
+                        Object variable = variableMap.get(entry.getValue().substring(1));
+                        mapParam.put(entry.getKey(), variable.toString());
+                    }
                 }
             }
-        } else if (listParam != null) {
-            listParam
+
         }
 
-        mapParam;
-        arraySingleParam;
-        arrayListParam;
-        arrayMapParam;
     }
 
 

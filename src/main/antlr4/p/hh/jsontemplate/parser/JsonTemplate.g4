@@ -9,13 +9,13 @@ singleProperty : propertyNameSpec;
 pairProperty : propertyNameSpec ':' propertyValueSpec;
 propertyNameSpec : propertyName | typeDef ;
 propertyName : IDENTIFIER;
-typeDef : '%'typeName;
+typeDef : '@'typeName;
 typeName : IDENTIFIER;
 
 propertyValueSpec : jsonValue | jsonArray | jsonObject | propertyVariableWrapper;
 propertyVariableWrapper : variableWrapper;
 jsonValue : typeInfo typeParamSpec?;
-typeInfo : '%'typeName;
+typeInfo : '@'typeName;
 
 typeParamSpec : '(' singleParam ')' | '(' listParams ')' | '(' mapParams ')';
 variableWrapper : IDENTIFIER | variable;

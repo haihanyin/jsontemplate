@@ -14,26 +14,26 @@ public class JsonTemplateObjectTest {
 
     @Test
     public void test_twoLevelObject() {
-        DocumentContext document = parse("{anObject:{aField:%s}}");
+        DocumentContext document = parse("{anObject:{aField:@s}}");
         assertThat(document.read("$.anObject.aField", String.class), is(notNullValue()));
     }
 
     @Test
     public void test_anObjectWithTwoFields() {
-        DocumentContext document = parse("{anObject:{aField:%s, bField:%s}}");
+        DocumentContext document = parse("{anObject:{aField:@s, bField:@s}}");
         assertThat(document.read("$.anObject.aField", String.class), is(notNullValue()));
         assertThat(document.read("$.anObject.bField", String.class), is(notNullValue()));
     }
 
     @Test
     public void test_multipleLevelObject() {
-        DocumentContext document = parse("{objA:{objB:{objC:{objD:{aField:%s}}}}}");
+        DocumentContext document = parse("{objA:{objB:{objC:{objD:{aField:@s}}}}}");
         assertThat(document.read("$.objA.objB.objC.objD.aField", String.class), is(notNullValue()));
     }
 
     @Test
     public void test_twoObjects() {
-        DocumentContext document = parse("{objA:{fieldA:%s},objB:{fieldB:%i}}");
+        DocumentContext document = parse("{objA:{fieldA:@s},objB:{fieldB:@i}}");
         assertThat(document.read("$.objA.fieldA", String.class), is(notNullValue()));
         assertThat(document.read("$.objB.fieldB", String.class), is(notNullValue()));
     }

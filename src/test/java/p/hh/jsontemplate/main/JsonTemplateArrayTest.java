@@ -14,52 +14,52 @@ public class JsonTemplateArrayTest {
 
     @Test
     public void test_emptyArray() {
-        DocumentContext document = parse("{anArray : %s[]}");
+        DocumentContext document = parse("{anArray : @s[]}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(0));
     }
 
     @Test
     public void test_nonEmptyArraySingleParam() {
-        DocumentContext document = parse("{anArray : %s[](3)}");
+        DocumentContext document = parse("{anArray : @s[](3)}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(3));
     }
 
     @Test
     public void test_nonEmptyArrayWithParamSize() {
-        DocumentContext document = parse("{anArray : %s[](size=3)}");
+        DocumentContext document = parse("{anArray : @s[](size=3)}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(3));
     }
 
     @Test
     public void test_nonEmptyArrayWithMinMaxList() {
-        DocumentContext document = parse("{anArray : %s[](1, 10)}");
+        DocumentContext document = parse("{anArray : @s[](1, 10)}");
         assertThat(document.read("$.anArray.length()", Integer.class),
                 allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(10)));
     }
 
     @Test
     public void test_nonEmptyArrayWithMinMaxMap() {
-        DocumentContext document = parse("{anArray : %s[](min=1, max=10)}");
+        DocumentContext document = parse("{anArray : @s[](min=1, max=10)}");
         assertThat(document.read("$.anArray.length()", Integer.class),
                 allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(10)));
     }
 
     @Test
     public void test_rootAsArray() {
-        DocumentContext document = parse("%s[](min=1, max=10)");
+        DocumentContext document = parse("@s[](min=1, max=10)");
         assertThat(document.read("$.length()", Integer.class),
                 allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(10)));
     }
 
     @Test
     public void test_arrayWithElements() {
-        DocumentContext document = parse("{anArray:%s[1, 2, 3, 4]}");
+        DocumentContext document = parse("{anArray:@s[1, 2, 3, 4]}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(4));
     }
 
     @Test
     public void test_arrayWithElementsAndSizeParam() {
-        DocumentContext document = parse("{anArray:%s[1, 2, 3, 4](6)}");
+        DocumentContext document = parse("{anArray:@s[1, 2, 3, 4](6)}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(6));
         assertThat(document.read("$.anArray[0]", String.class), is("1"));
         assertThat(document.read("$.anArray[1]", String.class), is("2"));
@@ -69,7 +69,7 @@ public class JsonTemplateArrayTest {
 
     @Test
     public void test_arrayWithElementsAndSmallSizeParam() {
-        DocumentContext document = parse("{anArray:%s[1, 2, 3, 4](2)}");
+        DocumentContext document = parse("{anArray:@s[1, 2, 3, 4](2)}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(4));
         assertThat(document.read("$.anArray[0]", String.class), is("1"));
         assertThat(document.read("$.anArray[1]", String.class), is("2"));
@@ -79,7 +79,7 @@ public class JsonTemplateArrayTest {
 
     @Test
     public void test_arrayWithoutDefaultType() {
-        DocumentContext document = parse("{anArray:[%s(1), %s(2), %s(3), %s(4)]}");
+        DocumentContext document = parse("{anArray:[@s(1), @s(2), @s(3), @s(4)]}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(4));
         assertThat(document.read("$.anArray[0]", String.class), is("1"));
         assertThat(document.read("$.anArray[1]", String.class), is("2"));
@@ -89,7 +89,7 @@ public class JsonTemplateArrayTest {
 
     @Test
     public void test_arrayMixedType() {
-        DocumentContext document = parse("{anArray:%s[1, %i(2), %b(false), %s(4)]}");
+        DocumentContext document = parse("{anArray:@s[1, @i(2), @b(false), @s(4)]}");
         assertThat(document.read("$.anArray.length()", Integer.class), is(4));
         assertThat(document.read("$.anArray[0]", String.class), is("1"));
         assertThat(document.read("$.anArray[1]", Integer.class), is(2));
@@ -97,8 +97,4 @@ public class JsonTemplateArrayTest {
         assertThat(document.read("$.anArray[3]", String.class), is("4"));
     }
 
-    @Test
-    public void test() {
-        parse("{%address : {city: %s(Utrecht), number: %i}, info: {home: %address, office: %address})}");
-    }
 }

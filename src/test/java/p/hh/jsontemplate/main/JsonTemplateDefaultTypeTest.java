@@ -14,21 +14,21 @@ public class JsonTemplateDefaultTypeTest {
 
     @Test
     public void test_simpleDefaultType() {
-        DocumentContext document = parse("%s{fieldA, fieldB}");
+        DocumentContext document = parse("@s{fieldA, fieldB}");
         assertThat(document.read("$.fieldA", String.class), is(notNullValue()));
         assertThat(document.read("$.fieldB", String.class), is(notNullValue()));
     }
 
     @Test
     public void test_overwriteDefaultType() {
-        DocumentContext document = parse("%s{fieldA, fieldB : %i { fieldC }}");
+        DocumentContext document = parse("@s{fieldA, fieldB : @i { fieldC }}");
         assertThat(document.read("$.fieldA", String.class), is(notNullValue()));
         assertThat(document.read("$.fieldB.fieldC", Integer.class), is(notNullValue()));
     }
 
     @Test
     public void test_simpleParamerizedDefaultType() {
-        DocumentContext document = parse("%s(size=10){fieldA, fieldB: %s(size=20)}");
+        DocumentContext document = parse("@s(size=10){fieldA, fieldB: @s(size=20)}");
         assertThat(document.read("$.fieldA", String.class).length(), is(10));
         assertThat(document.read("$.fieldB", String.class).length(), is(20));
     }
