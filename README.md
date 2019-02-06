@@ -8,8 +8,10 @@
 {
   "aField" : "ISCZd"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td><td>
+<b>@</b> is a type indicator, <b>@s</b> refers to the string type. 
+The length of the generated string by default is 5.
+</td></tr>
 
 
 <tr><td><pre>
@@ -20,8 +22,10 @@
 {
   "aField" : "myValue"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td><td>
+The string type <b>@s</b> is parameterized with a single value <i>myValue</i>. The generated
+string is a fixed value <i>myValue</i>.
+</td></tr>
 
 
 <tr><td><pre>
@@ -32,20 +36,10 @@
 {
   "aField" : "C"
 }
-</pre></td>
-<td>comments</td></tr>
-
-
-<tr><td><pre>
-{
-  aField : @s(size=10)
-}
-</pre></td><td><pre>
-{
-  "aField" : "XvtFg"
-}
-</pre></td>
-<td>comments</td></tr>
+</pre></td><td>
+The string type <b>@s</b> is parameterized with a list value. The generated
+string is one of the value enumerated in the list.
+</td></tr>
 
 
 <tr><td><pre>
@@ -56,9 +50,10 @@
 {
   "aField" : "awpVXpJTxb"
 }
-</pre></td>
-<td>comments</td></tr>
-
+</pre></td><td>
+The string type <b>@s</b> is parameterized with a named value <i>size=10</i>. The lenght of 
+the generated string is configured to be 10.
+</td></tr>
 
 <tr><td><pre>
 {
@@ -68,8 +63,10 @@
 {
   "aField" : "KebKyjkmuTZitvJcXlGg"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td><td>
+The string type <b>@s</b> is parameterized with a named value <i>size=10</i>. The lenght of 
+the generated string is configured to be 10.
+</td></tr>
 
 
 <tr><td><pre>
