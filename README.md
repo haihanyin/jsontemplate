@@ -13,7 +13,7 @@
 {
   "aField" : "ISCZd"
 }
-</pre></td></tr><tr><td colspan="2">
+</pre></td></tr><tr><td colspan="2" valign="top" height="200">
 <b>@</b> is a type indicator, <b>@s</b> refers to the string type. 
 The length of the generated string by default is 5.
 </td></tr>
