@@ -17,6 +17,7 @@
 <b>@</b> is a type indicator, <b>@s</b> refers to the string type. 
 The length of the generated string by default is 5.
 </td></tr>
+<tr><td colspan="2" valign="top" height="80"></td></tr>
 
 <tr><td><pre>
 {
