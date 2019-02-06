@@ -1,5 +1,5 @@
 # jsontemplate
-<table><tr><th>Template</th><th>Generated Json</th><th>Description</th</tr>
+<table><tr><th>Template</th><th>Generated Json</th><th>Description</th></tr>
 <tr><td><pre>
 {
   aField : @s
