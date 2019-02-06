@@ -1,19 +1,8 @@
 # jsontemplate
 <table>
-  <tr>
-    <td>One</td>
-    <td>Two</td>
-  </tr>
-  <tr>
-    <td colspan="2">Three</td>
-  </tr>
-</table>
-<table>
 <tr>
 <th>Template</th>
 <th>Generated Json</th>
-<th>Description</th>
-<th></th>
 </tr>
 
 <tr><td><pre>
@@ -24,7 +13,7 @@
 {
   "aField" : "ISCZd"
 }
-</pre></td><td colspan="2">
+</pre></td></tr><tr><td colspan="2">
 <b>@</b> is a type indicator, <b>@s</b> refers to the string type. 
 The length of the generated string by default is 5.
 </td></tr>
@@ -38,7 +27,7 @@ The length of the generated string by default is 5.
 {
   "aField" : "myValue"
 }
-</pre></td><td>
+</pre></td></tr><tr><td colspan="2">
 The string type <b>@s</b> is parameterized with a single value <i>myValue</i>. The generated
 string is a fixed value <i>myValue</i>.
 </td></tr>
@@ -52,7 +41,7 @@ string is a fixed value <i>myValue</i>.
 {
   "aField" : "C"
 }
-</pre></td><td>
+</pre></td></tr><tr><td colspan="2">
 The string type <b>@s</b> is parameterized with a list value. The generated
 string is one of the value enumerated in the list.
 </td></tr>
@@ -66,7 +55,7 @@ string is one of the value enumerated in the list.
 {
   "aField" : "awpVXpJTxb"
 }
-</pre></td><td>
+</pre></td></tr><tr><td colspan="2">
 The string type <b>@s</b> is parameterized with a named value <i>size=10</i>. The lenght of 
 the generated string is configured to be 10.
 </td></tr>
@@ -79,7 +68,7 @@ the generated string is configured to be 10.
 {
   "aField" : "KebKyjkmuTZitvJcXlGg"
 }
-</pre></td><td>
+</pre></td></tr><tr><td colspan="2">
 The string type <b>@s</b> is parameterized with a named value <i>size=10</i>. The lenght of 
 the generated string is configured to be 10.
 </td></tr>
@@ -93,8 +82,8 @@ the generated string is configured to be 10.
 {
   "aField" : 18
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -111,8 +100,8 @@ the generated string is configured to be 10.
     "bField" : "EyHbB"
   }
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -123,8 +112,8 @@ the generated string is configured to be 10.
   "tDcPO",
   "OgdGC"
 ]
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -139,8 +128,8 @@ the generated string is configured to be 10.
     "qsEXA",
     "YHkxC"
 ]
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -157,8 +146,8 @@ the generated string is configured to be 10.
   "3",
   "4"
 ]
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -177,8 +166,8 @@ the generated string is configured to be 10.
     "qRTWm",
     "RTBik"
   ]
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -195,8 +184,8 @@ the generated string is configured to be 10.
   false,
   "4"
 ]
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 <tr><td><pre>
 {
@@ -221,8 +210,8 @@ the generated string is configured to be 10.
     "number" : 63
   }
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -248,8 +237,8 @@ the generated string is configured to be 10.
     "number" : 1024
   }
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -260,8 +249,8 @@ the generated string is configured to be 10.
 {
   "ipField" : "59.221.49.83"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -274,8 +263,8 @@ the generated string is configured to be 10.
   "fieldA" : "yUiIE",
   "fieldB" : "vrMwv"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -288,8 +277,8 @@ the generated string is configured to be 10.
   "fieldA" : "yUiIE",
   "fieldB" : "vrMwv"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -300,8 +289,8 @@ the generated string is configured to be 10.
 {
   "name" : "John"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -316,8 +305,8 @@ the generated string is configured to be 10.
     "C"
   ]
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -337,8 +326,8 @@ the generated string is configured to be 10.
     "male" : true
   }
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -349,8 +338,8 @@ the generated string is configured to be 10.
 {
   "aField" : "helloworld"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -361,8 +350,8 @@ the generated string is configured to be 10.
 {
   "aField" : "C"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 
 <tr><td><pre>
@@ -373,8 +362,8 @@ the generated string is configured to be 10.
 {
   "aField" : "HORklISFDrQzhumRojWQ"
 }
-</pre></td>
-<td>comments</td></tr>
+</pre></td></tr><tr><td colspan="2">
+comments</td></tr>
 
 </table>
 
