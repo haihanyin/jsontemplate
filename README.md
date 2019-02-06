@@ -1,10 +1,10 @@
 # jsontemplate
-
-<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr><tr><td><pre>
+##Examples
+<table><tr><td width="600"><pre>
 {
   aField : aField : @s(A, B, C, D)
 }
-</pre></td><td><pre>
+</pre></td><td width="50%"><pre>
 {
   "aField" : "ISCZd"
 }
