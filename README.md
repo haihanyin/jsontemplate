@@ -1,29 +1,20 @@
 # jsontemplate
 
-<table>
-<tr>
-<th width="200">Template</th>
-<th width="200">Generated Json</th>
-</tr>
-
-<tr><td width="200">
-<pre>
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr><tr><td><pre>
 {
   aField : aField : @s(A, B, C, D)
 }
-</pre>
-  </td><td width="500"><pre>
+</pre></td><td><pre>
 {
   "aField" : "ISCZd"
-}</pre>
-  </td></tr>
-</table>
+}
+</pre></td></tr></table>
 some explaination here
 
 <table>
 <tr>
-<th width="200px">Template</th>
-<th width="200px">Generated Json</th>
+<th width="600">Template</th>
+<th width="50%">Generated Json</th>
 </tr>
 
 <tr><td><pre>
