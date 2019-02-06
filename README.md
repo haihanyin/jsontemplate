@@ -2,15 +2,17 @@
 
 <table>
 <tr>
-<th width="50%">Template</th>
-<th width="50%">Generated Json</th>
+<th width="200">Template</th>
+<th width="200">Generated Json</th>
 </tr>
 
-<tr><td width="50%"><pre>
+<tr><td width="200">
+<pre>
 {
   aField : aField : @s(A, B, C, D)
-}</pre>
-  </td><td width="50%"><pre>
+}
+</pre>
+  </td><td width="500"><pre>
 {
   "aField" : "ISCZd"
 }</pre>
