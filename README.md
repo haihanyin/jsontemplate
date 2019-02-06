@@ -1,22 +1,7 @@
 # jsontemplate
-##Examples
-<table><tr><td width="600"><pre>
-{
-  aField : aField : @s(A, B, C, D)
-}
-</pre></td><td width="50%"><pre>
-{
-  "aField" : "ISCZd"
-}
-</pre></td></tr></table>
-some explaination here
-
-<table>
-<tr>
-<th width="600">Template</th>
-<th width="50%">Generated Json</th>
-</tr>
-
+## Example
+### Simple types
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
 {
   aField : @s
@@ -26,48 +11,30 @@ some explaination here
   "aField" : "ISCZd"
 }
 </pre></td></tr>
-</table>
-some explaination here
-
-
-
-<table>
-<tr>
-<th>Template</th>
-<th>Generated Json</th>
-</tr>
-
 <tr><td><pre>
 {
-  aField : @s
+  aField : @i
 }
 </pre></td><td><pre>
 {
-  "aField" : "ISCZd"
+  "aField" : 56
+}
+</pre></td></tr>
+<tr><td><pre>
+{
+  aField : @b
+}
+</pre></td><td><pre>
+{
+  "aField" : false
 }
 </pre></td></tr>
 </table>
-some explaination here
-
-<table>
-<tr>
-<th>Template</th>
-<th>Generated Json</th>
-</tr>
-
-<tr><td><pre>
-{
-  aField : @s
-}
-</pre></td><td><pre>
-{
-  "aField" : "ISCZd"
-}
-</pre></td></tr><tr><td colspan="2" valign="top">
 <b>@</b> is a type indicator, <b>@s</b> refers to the string type. 
 The length of the generated string by default is 5.
-</td></tr>
 
+### Simple types with a fixed value
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
 {
   aField : @s(myValue)
@@ -76,12 +43,13 @@ The length of the generated string by default is 5.
 {
   "aField" : "myValue"
 }
-</pre></td></tr><tr><td colspan="2">
+</pre></td></tr>
+</table>
 The string type <b>@s</b> is parameterized with a single value <i>myValue</i>. The generated
 string is a fixed value <i>myValue</i>.
-</td></tr>
 
-
+### Simple types with enumerations
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
 {
   aField : @s(A, B, C, D)
@@ -90,12 +58,13 @@ string is a fixed value <i>myValue</i>.
 {
   "aField" : "C"
 }
-</pre></td></tr><tr><td colspan="2">
+</pre></td></tr>
+</table>
 The string type <b>@s</b> is parameterized with a list value. The generated
 string is one of the value enumerated in the list.
-</td></tr>
 
-
+### Simple types with configuration
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
 {
   aField : @s(size=10)
@@ -104,37 +73,23 @@ string is one of the value enumerated in the list.
 {
   "aField" : "awpVXpJTxb"
 }
-</pre></td></tr><tr><td colspan="2">
-The string type <b>@s</b> is parameterized with a named value <i>size=10</i>. The lenght of 
-the generated string is configured to be 10.
-</td></tr>
-
+</pre></td></tr>
 <tr><td><pre>
 {
   aField : @s(min=10, max=20)
 }
 </pre></td><td><pre>
 {
-  "aField" : "KebKyjkmuTZitvJcXlGg"
+  "aField" : "awpVXpJTxb"
 }
-</pre></td></tr><tr><td colspan="2">
+</pre></td></tr>
+</table>
 The string type <b>@s</b> is parameterized with a named value <i>size=10</i>. The lenght of 
 the generated string is configured to be 10.
 </td></tr>
 
-
-<tr><td><pre>
-{ 
-  aField : @i(min=10, max=20)
-}
-</pre></td><td><pre>
-{
-  "aField" : 18
-}
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
-
-
+### Object type
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
 {
   anObject : {
@@ -149,93 +104,44 @@ comments</td></tr>
     "bField" : "EyHbB"
   }
 }
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
+</pre></td></tr>
+</table>
 
 
+### Array type with size configuration
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
 @s[](3)
 </pre></td><td><pre>
-[
-  "hwhCL",
-  "tDcPO",
-  "OgdGC"
-]
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
-
-
+[ "hwhCL", "tDcPO", "OgdGC" ]
+</pre></td></tr>
 <tr><td><pre>
 @s[](1, 10)
 </pre></td><td><pre>
-[
-    "QwWxg",
-    "ytaGY",
-    "NGZBr",
-    "DsBKx",
-    "MvwSb",
-    "qsEXA",
-    "YHkxC"
-]
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
+[ "QwWxg", "ytaGY", "NGZBr", "DsBKx", "MvwSb", "qsEXA", "YHkxC" ]
+</pre></td></tr>
+</table>
 
-
+### Array type with elements
+<table><tr><th width="600">Template</th><th width="50%">Generated Json</th></tr>
 <tr><td><pre>
-@s [
-  1, 
-  2, 
-  3, 
-  4
-]
+@s [ 1, 2, 3, 4 ]
 </pre></td><td><pre>
-[
-  "1",
-  "2",
-  "3",
-  "4"
-]
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
-
-
+[ "1", "2", "3", "4" ]
+</pre></td></tr>
 <tr><td><pre>
-@s [
-  1, 
-  2, 
-  3, 
-  4
-](6)
+@s [ 1, 2, 3, 4 ](6)
 </pre></td><td><pre>
-  [
-    "1",
-    "2",
-    "3",
-    "4",
-    "qRTWm",
-    "RTBik"
-  ]
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
-
-
+[ "1", "2", "3", "4", "qRTWm", "RTBik" ]
+</pre></td></tr>
 <tr><td><pre>
-@s [
-  1, 
-  @i(2), 
-  @b(false), 
-  @s(4)
-] 
+@s [ 1, @i(2), @b(false), @s(4) ]
 </pre></td><td><pre>
-[
-  "1",
-  2,
-  false,
-  "4"
-]
-</pre></td></tr><tr><td colspan="2">
-comments</td></tr>
+[ "1", 2, false, "4" ]
+</pre></td></tr>
+</table>
 
+### Customized type
 <tr><td><pre>
 {
   @address : {
@@ -289,7 +195,7 @@ comments</td></tr>
 </pre></td></tr><tr><td colspan="2">
 comments</td></tr>
 
-
+### Other pre-installed types
 <tr><td><pre>
 {
   ipField : @ip
@@ -301,7 +207,7 @@ comments</td></tr>
 </pre></td></tr><tr><td colspan="2">
 comments</td></tr>
 
-
+### Default type
 <tr><td><pre>
 @s {
   fieldA, 
@@ -324,11 +230,13 @@ comments</td></tr>
 </pre></td><td><pre>
 {
   "fieldA" : "yUiIE",
-  "fieldB" : "vrMwv"
+  "fieldB" : "vrMwv" // todo
 }
 </pre></td></tr><tr><td colspan="2">
 comments</td></tr>
 
+## Inject variables
+### Use the variable indicator in value specification
 
 <tr><td><pre>
 {
@@ -378,7 +286,7 @@ comments</td></tr>
 </pre></td></tr><tr><td colspan="2">
 comments</td></tr>
 
-
+### Use the variable indicator in type specification
 <tr><td><pre>
 {
   aField: @s($myValue)
@@ -414,5 +322,9 @@ comments</td></tr>
 </pre></td></tr><tr><td colspan="2">
 comments</td></tr>
 
+ ### use String.format()
+ 
+ 
 </table>
+
 
