@@ -1,9 +1,19 @@
 # jsontemplate
 <table>
+  <tr>
+    <td>One</td>
+    <td>Two</td>
+  </tr>
+  <tr>
+    <td colspan="2">Three</td>
+  </tr>
+</table>
+<table>
 <tr>
 <th>Template</th>
 <th>Generated Json</th>
-<th>Description&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+<th>Description</th>
+<th></th>
 </tr>
 
 <tr><td><pre>
@@ -14,7 +24,7 @@
 {
   "aField" : "ISCZd"
 }
-</pre></td><td>
+</pre></td><td colspan="2">
 <b>@</b> is a type indicator, <b>@s</b> refers to the string type. 
 The length of the generated string by default is 5.
 </td></tr>
